@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<br><br>
+
+{% if current_user.is_authenticated %}
+<h3>My Account:</h3>
+  <head>
+    <title> Hi</title>
+    </head>
+    <body>
+        <h3>test</h3>
+    </body>
+{% else %}
+<p><a href="{{ url_for('users.login') }}">Log in</a> to see your purchase history!</p>
+{% endif %}
+
+{% endblock %}
