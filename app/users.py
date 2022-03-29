@@ -75,9 +75,14 @@ def logout():
     logout_user()
     return redirect(url_for('index.index'))
 
-@bp.route('/info')
+@bp.route('/info', methods=['GET','POST'])
 def info():
     if current_user.is_authenticated:
-        return render_template('info.html')
+        accountnum = current_user.id
+        firstname = current_user.firstname
+        lastname = current_user.lastname
+        email = current_user.email
+        return render_template('info.html', accountnum = accountnum, firstname = firstname,
+        lastname = lastname, email = email)
     else:
         return redirect(url_for('users.login'))
