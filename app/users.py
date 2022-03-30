@@ -117,8 +117,33 @@ def edit_info():
             if User.edit(id, email_temp, firstname_temp, lastname_temp):
                 return render_template('info.html', accountnum = id, firstname = firstname_temp,
                 lastname = lastname_temp, email = email_temp)
-        else:
             flash("Something is wrong! Please try again!")
+        else:
             return render_template('editinfo.html', accountnum = id, form = form)
+    else:
+        return redirect(url_for('users.login'))
+
+class ChangePasswordForm(FlaskForm):
+    accountnum = StringField('Account Number')
+    password = PasswordField('New Password', validators=[DataRequired()])
+    password2 = PasswordField(
+        'Repeat Password', validators=[DataRequired(),
+                                       EqualTo('password')])
+    submit = SubmitField('Commit Changes')
+
+@bp.route('/info/password', methods=['GET','POST'])
+def change_password():
+    if current_user.is_authenticated:
+        form = ChangePasswordForm()
+        id = current_user.id
+        form.accountnum.data = id
+        if form.validate_on_submit():
+            if User.change_password(id,form.password.data):
+                logout_user()
+                flash("Password Updated")
+                return redirect(url_for('users.login'))
+            flash("Something is wrong! Please try again!")
+        else:
+            return render_template('password.html', accountnum = id, form = form)
     else:
         return redirect(url_for('users.login'))

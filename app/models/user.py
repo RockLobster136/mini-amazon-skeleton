@@ -87,3 +87,14 @@ WHERE id = :id
             # the following simply prints the error to the console:
             print(str(e))
             return None
+
+    @staticmethod
+    def change_password(id, password):
+        rows = app.db.execute("""
+UPDATE Users
+SET password = :password
+WHERE id = :id
+""",
+                              id=id,
+                              password = generate_password_hash(password))
+        return User.get(id)
