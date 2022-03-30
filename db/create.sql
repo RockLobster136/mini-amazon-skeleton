@@ -25,7 +25,7 @@ CREATE TABLE Purchases (
     uid INT NOT NULL REFERENCES Users(id), -- buyer id
     pid INT NOT NULL, -- get product, copied from invetory
     sid INT NOT NULL, -- get seller, copied from inventory
-    time_purchased timestamp without time zone NOT NULL DEFAULT (current_timestamp AT TIME ZONE 'UTC')
+    time_purchased timestamp without time zone NOT NULL DEFAULT (current_timestamp AT TIME ZONE 'UTC'),
     quantity INT NOT NULL CHECK (quantity >= 0), -- quant ordered
     price DECIMAL(12,2) NOT NULL -- price sold/bought
 );
