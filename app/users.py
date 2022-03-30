@@ -86,3 +86,39 @@ def info():
         lastname = lastname, email = email)
     else:
         return redirect(url_for('users.login'))
+
+class EditInfoForm(FlaskForm):
+    accountnum = StringField('Account Number')
+    firstname = StringField('First Name', validators=[DataRequired()])
+    lastname = StringField('Last Name', validators=[DataRequired()])
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    submit = SubmitField('Commit Changes')
+
+@bp.route('/info/edit', methods=['GET','POST'])
+def edit_info():
+    if current_user.is_authenticated:
+        form = EditInfoForm()
+        id = current_user.id
+        form.accountnum.data = id
+        firstname_temp = current_user.firstname
+        lastname_temp = current_user.lastname
+        email_temp = current_user.email
+        if form.validate_on_submit():
+            if current_user.firstname != form.firstname.data:
+                firstname_temp = form.firstname.data
+            if current_user.lastname != form.lastname.data:
+                lastname_temp = form.lastname.data
+            if current_user.email != form.email.data:
+                if User.email_exists(form.email.data):
+                    flash("email already exists")
+                    return render_template('editinfo.html', accountnum = id, form = form)
+                else:
+                    email_temp = form.email.data
+            if User.edit(id, email_temp, firstname_temp, lastname_temp):
+                return render_template('info.html', accountnum = id, firstname = firstname_temp,
+                lastname = lastname_temp, email = email_temp)
+        else:
+            flash("Something is wrong! Please try again!")
+            return render_template('editinfo.html', accountnum = id, form = form)
+    else:
+        return redirect(url_for('users.login'))

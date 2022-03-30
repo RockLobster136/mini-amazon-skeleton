@@ -19,7 +19,22 @@
   <p>
     Email: {{email}}
   </p>
+  <p>
+    Address: {{address}}
+  </p>
+  <p>
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <ul>
+      {% for message in messages %}
+      <li>{{ message }}</li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+    {% endwith %}
+  </p>
 </body>
-  <a class="btn btn-secondary" href="{{ url_for('index.index') }}" role="button">Home</a>
-  <a class="btn btn-secondary" href="{{ url_for('index.index') }}" role="button">Edit</a>
+
+<a class="btn btn-secondary" href="{{ url_for('index.index') }}" role="button">Home</a>
+<a class="btn btn-secondary" href="{{ url_for('users.edit_info') }}" role="button">Edit</a>
 {% endblock %}
