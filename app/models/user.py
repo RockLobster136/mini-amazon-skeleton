@@ -6,17 +6,18 @@ from .. import login
 
 
 class User(UserMixin):
-    def __init__(self, id, email, firstname, lastname, isSeller):
+    def __init__(self, id, email, firstname, lastname, isSeller, balance):
         self.id = id
         self.email = email
         self.firstname = firstname
         self.lastname = lastname
         self.isSeller = isSeller
+        self.balance = balance
 
     @staticmethod
     def get_by_auth(email, password):
         rows = app.db.execute("""
-SELECT password, id, email, firstname, lastname, isSeller
+SELECT password, id, email, firstname, lastname, isSeller, balance
 FROM Users
 WHERE email = :email
 """,
@@ -43,13 +44,16 @@ WHERE email = :email
     def register(email, password, firstname, lastname, isSeller):
         try:
             rows = app.db.execute("""
-INSERT INTO Users(email, password, firstname, lastname, isSeller)
-VALUES(:email, :password, :firstname, :lastname, :isSeller)
+INSERT INTO Users(email, password, firstname, lastname, isSeller, balance)
+VALUES(:email, :password, :firstname, :lastname, :isSeller, :balance)
 RETURNING id
 """,
                                   email=email,
                                   password=generate_password_hash(password),
-                                  firstname=firstname, lastname=lastname, isSeller=isSeller)
+                                  firstname=firstname, 
+                                  lastname=lastname, 
+                                  isSeller=isSeller,
+                                  balance=0)
             id = rows[0][0]
             return User.get(id)
         except Exception as e:
@@ -62,7 +66,7 @@ RETURNING id
     @login.user_loader
     def get(id):
         rows = app.db.execute("""
-SELECT id, email, firstname, lastname, isSeller
+SELECT id, email, firstname, lastname, isSeller, balance
 FROM Users
 WHERE id = :id
 """,

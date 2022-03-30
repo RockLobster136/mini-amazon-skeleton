@@ -2,16 +2,16 @@ from flask import current_app as app
 
 
 class Product:
-    def __init__(self, id, name, price, available):
+    def __init__(self, id, name, available, category):
         self.id = id
         self.name = name
-        self.price = price
         self.available = available
+        self.category = category
 
     @staticmethod
     def get(id):
         rows = app.db.execute('''
-SELECT id, name, price, available
+SELECT id, name, available, category
 FROM Products
 WHERE id = :id
 ''',
@@ -21,7 +21,7 @@ WHERE id = :id
     @staticmethod
     def get_all(available=True):
         rows = app.db.execute('''
-SELECT id, name, price, available
+SELECT id, name, available, category
 FROM Products
 WHERE available = :available
 ''',
