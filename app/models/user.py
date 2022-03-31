@@ -6,18 +6,19 @@ from .. import login
 
 
 class User(UserMixin):
-    def __init__(self, id, email, firstname, lastname, isSeller, balance):
+    def __init__(self, id, email, firstname, lastname, isSeller, balance, address):
         self.id = id
         self.email = email
         self.firstname = firstname
         self.lastname = lastname
         self.isSeller = isSeller
         self.balance = balance
+        self.address = address
 
     @staticmethod
     def get_by_auth(email, password):
         rows = app.db.execute("""
-SELECT password, id, email, firstname, lastname, isSeller, balance
+SELECT password, id, email, firstname, lastname, isSeller, balance, address
 FROM Users
 WHERE email = :email
 """,
@@ -44,8 +45,8 @@ WHERE email = :email
     def register(email, password, firstname, lastname, isSeller):
         try:
             rows = app.db.execute("""
-INSERT INTO Users(email, password, firstname, lastname, isSeller, balance)
-VALUES(:email, :password, :firstname, :lastname, :isSeller, :balance)
+INSERT INTO Users(email, password, firstname, lastname, isSeller, balance, address)
+VALUES(:email, :password, :firstname, :lastname, :isSeller, :balance, :address)
 RETURNING id
 """,
                                   email=email,
@@ -53,7 +54,9 @@ RETURNING id
                                   firstname=firstname, 
                                   lastname=lastname, 
                                   isSeller=isSeller,
-                                  balance=0)
+                                  balance=0,
+                                  address = None)
+
             id = rows[0][0]
             return User.get(id)
         except Exception as e:
@@ -66,7 +69,7 @@ RETURNING id
     @login.user_loader
     def get(id):
         rows = app.db.execute("""
-SELECT id, email, firstname, lastname, isSeller, balance
+SELECT id, email, firstname, lastname, isSeller, balance, address
 FROM Users
 WHERE id = :id
 """,
@@ -74,17 +77,18 @@ WHERE id = :id
         return User(*(rows[0])) if rows else None
 
     @staticmethod
-    def edit(id, email, firstname, lastname):
+    def edit(id, email, firstname, lastname, address):
         try:
             rows = app.db.execute("""
 UPDATE Users
-SET email = :email, firstname = :firstname, lastname = :lastname
+SET email = :email, firstname = :firstname, lastname = :lastname, address = :address
 WHERE id = :id
 """,
                                  id = id,
                                  email = email,
                                  firstname = firstname,
-                                 lastname = lastname)
+                                 lastname = lastname,
+                                 address = address)
             return User.get(id)
         except Exception as e:
             # likely email already in use; better error checking and reporting needed;

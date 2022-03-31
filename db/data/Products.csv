@@ -1,6 +1,7 @@
-1,vanilla ice cream,2.99,true
-2,chocolate ice cream,2.99,true
-3,strawberry ice cream,2.99,true
-4,6-pack of paycheck pilsners,11.49,true
-5,seven fabergé easter eggs,1199000.00,true
-6,painting - the storm on the sea of galilee,44000000.00,true
+1,Dell Laptop,true,1
+2,IPhone Charger,false,1
+3,Desktop Monitor,true,1
+4,Kitchen Towel,true,2
+5,Dish Wash,true,2
+6,Coca-Cola,true,3
+7,Budweiser,false,3

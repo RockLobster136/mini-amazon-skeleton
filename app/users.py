@@ -84,8 +84,9 @@ def info():
         lastname = current_user.lastname
         email = current_user.email
         balance = current_user.balance
+        address = current_user.address
         return render_template('info.html', accountnum = accountnum, firstname = firstname,
-        lastname = lastname, email = email, balance = balance)
+        lastname = lastname, email = email, balance = balance, address = address)
     else:
         return redirect(url_for('users.login'))
 
@@ -94,7 +95,9 @@ class EditInfoForm(FlaskForm):
     firstname = StringField('First Name', validators=[DataRequired()])
     lastname = StringField('Last Name', validators=[DataRequired()])
     email = StringField('Email', validators=[DataRequired(), Email()])
+    address = StringField('Address', validators=[DataRequired()])
     submit = SubmitField('Commit Changes')
+
 
 @bp.route('/info/edit', methods=['GET','POST'])
 def edit_info():
@@ -105,21 +108,24 @@ def edit_info():
         form.accountnum.data = id
         firstname_temp = current_user.firstname
         lastname_temp = current_user.lastname
+        address_temp = current_user.address
         email_temp = current_user.email
         if form.validate_on_submit():
             if current_user.firstname != form.firstname.data:
                 firstname_temp = form.firstname.data
             if current_user.lastname != form.lastname.data:
                 lastname_temp = form.lastname.data
+            if current_user.address != form.address.data:
+                address_temp = form.address.data
             if current_user.email != form.email.data:
                 if User.email_exists(form.email.data):
                     flash("email already exists")
                     return render_template('editinfo.html', accountnum = id, form = form)
                 else:
                     email_temp = form.email.data
-            if User.edit(id, email_temp, firstname_temp, lastname_temp):
+            if User.edit(id, email_temp, firstname_temp, lastname_temp, address_temp):
                 return render_template('info.html', accountnum = id, firstname = firstname_temp,
-                lastname = lastname_temp, email = email_temp, balance = balance)
+                lastname = lastname_temp, email = email_temp, balance = balance, address = address_temp)
             flash("Something is wrong! Please try again!")
         else:
             return render_template('editinfo.html', accountnum = id, form = form)
@@ -172,7 +178,7 @@ def fund():
                 return render_template('fund.html', accountnum = id, form = form)
             if User.mgmt_fund(id,new_balance):
                 return render_template('info.html', accountnum = id, firstname = current_user.firstname,
-                lastname = current_user.lastname, email = current_user.email, balance = new_balance)
+                lastname = current_user.lastname, email = current_user.email, balance = new_balance, address = current_user.address)
             flash("Something is wrong! Please try again!")
         else:
             flash("Enter a negative amount for withdrawal.")

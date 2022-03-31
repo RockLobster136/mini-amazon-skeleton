@@ -10,7 +10,8 @@
     <tr>
       <th scope="col">Product ID</th>
       <th scope="col">Product Name</th>
-      <th scope="col">Price</th>
+      <th scope="col">Available</th>
+      <th scope="col">Category</th>
     </tr>
   </thead>
   <tbody>
@@ -18,11 +19,13 @@
       <tr>
         <th scope="row">{{product.id}}</th>
         <td>{{product.name}}</td>
-        <td>{{product.price}}</td>
+        <td>{{product.available}}</td>
+        <td>{{product.category}}</td>
       </tr>
     {% endfor %}
   </tbody>
 </table>
+
 {% if not current_user.is_authenticated %}
 <p><a href="{{ url_for('users.login') }}">Log in</a> to see your history!</p>
 {% endif %}
