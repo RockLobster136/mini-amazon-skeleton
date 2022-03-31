@@ -1,12 +1,13 @@
 from flask import render_template, redirect, url_for, flash, request
 from werkzeug.urls import url_parse
 from flask_login import login_user, logout_user, current_user
+import datetime
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, DecimalField
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo
 
 from .models.user import User
-
+from .models.purchase import Purchase
 
 from flask import Blueprint
 bp = Blueprint('users', __name__)
@@ -178,3 +179,13 @@ def fund():
             return render_template('fund.html', accountnum = id, form = form)
     else:
         return redirect(url_for('users.login'))
+
+@bp.route('/history', methods=['GET','POST'])
+def history():
+    if current_user.is_authenticated:
+        purchases = Purchase.get_all_by_uid_since(
+            current_user.id, datetime.datetime(1980, 9, 14, 0, 0, 0))
+    else:
+        purchases = None
+    return render_template('history.html',
+                           purchase_history=purchases)
