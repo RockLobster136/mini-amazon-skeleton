@@ -2,7 +2,7 @@ from flask import render_template, redirect, url_for, flash, request
 from werkzeug.urls import url_parse
 from flask_login import login_user, logout_user, current_user
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, DecimalField
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo
 
 from .models.user import User
@@ -82,8 +82,9 @@ def info():
         firstname = current_user.firstname
         lastname = current_user.lastname
         email = current_user.email
+        balance = current_user.balance
         return render_template('info.html', accountnum = accountnum, firstname = firstname,
-        lastname = lastname, email = email)
+        lastname = lastname, email = email, balance = balance)
     else:
         return redirect(url_for('users.login'))
 
@@ -99,6 +100,7 @@ def edit_info():
     if current_user.is_authenticated:
         form = EditInfoForm()
         id = current_user.id
+        balance = current_user.balance
         form.accountnum.data = id
         firstname_temp = current_user.firstname
         lastname_temp = current_user.lastname
@@ -116,7 +118,7 @@ def edit_info():
                     email_temp = form.email.data
             if User.edit(id, email_temp, firstname_temp, lastname_temp):
                 return render_template('info.html', accountnum = id, firstname = firstname_temp,
-                lastname = lastname_temp, email = email_temp)
+                lastname = lastname_temp, email = email_temp, balance = balance)
             flash("Something is wrong! Please try again!")
         else:
             return render_template('editinfo.html', accountnum = id, form = form)
@@ -145,5 +147,34 @@ def change_password():
             flash("Something is wrong! Please try again!")
         else:
             return render_template('password.html', accountnum = id, form = form)
+    else:
+        return redirect(url_for('users.login'))
+
+class FundForm(FlaskForm):
+    accountnum = StringField('Account Number')
+    amount = DecimalField('Amount', validators=[DataRequired()])
+    submit = SubmitField('Commit')
+
+@bp.route('/info/fund', methods=['GET','POST'])
+def fund():
+    if current_user.is_authenticated:
+        form = FundForm()
+        id = current_user.id
+        form.accountnum.data = id
+        if form.validate_on_submit():
+            if (len(str(abs(form.amount.data))) - len(str(abs(int(form.amount.data))))) > 3:
+                flash("Please round your input to 2 decimal places.")
+                return render_template('fund.html', accountnum = id, form = form)
+            new_balance = current_user.balance + form.amount.data
+            if new_balance < 0:
+                flash("Insufficient Fund.")
+                return render_template('fund.html', accountnum = id, form = form)
+            if User.mgmt_fund(id,new_balance):
+                return render_template('info.html', accountnum = id, firstname = current_user.firstname,
+                lastname = current_user.lastname, email = current_user.email, balance = new_balance)
+            flash("Something is wrong! Please try again!")
+        else:
+            flash("Enter a negative amount for withdrawal.")
+            return render_template('fund.html', accountnum = id, form = form)
     else:
         return redirect(url_for('users.login'))

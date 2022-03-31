@@ -36,4 +36,12 @@
 </body>
 <a class="btn btn-secondary" href="{{ url_for('users.edit_info') }}" role="button">Edit</a>
 <a class="btn btn-secondary" href="{{ url_for('users.change_password') }}" role="button">Change Password</a>
+<h3></h3>
+<br>
+<body>
+  <p>
+    Balance: {{balance}}
+  </p>
+</body>
+<a class="btn btn-secondary" href="{{ url_for('users.fund') }}" role="button">Manage Fund</a>
 {% endblock %}

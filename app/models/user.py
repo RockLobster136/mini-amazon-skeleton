@@ -102,3 +102,14 @@ WHERE id = :id
                               id=id,
                               password = generate_password_hash(password))
         return User.get(id)
+
+    @staticmethod
+    def mgmt_fund(id, balance):
+        rows = app.db.execute("""
+UPDATE Users
+SET balance = :balance
+WHERE id = :id
+""",
+                              id=id,
+                              balance = balance)
+        return User.get(id)
