@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h5>Manage Balance</h5>
+
+<form action="" method="post" novalidate>
+  {{ form.hidden_tag() }}
+  <p>
+    {{ form.prodName.label }}<br/>
+    {{ form.prodName(size=32) }}<br/>
+    {{ form.prodCat.label }}<br/>
+    {{ form.prodCat(size=32) }}<br/>
+    {{ form.Price.label }}<br/>
+    {{ form.Price(size=32) }}<br/>
+    {{ form.Quantity.label }}<br/>
+    {{ form.Quantity(size=32) }}<br/>
+    {{ form.newProd.label }}
+    {{ form.newProd(size=38) }}
+    {% for error in form.Price.errors %}
+    <span style="color: red;">[{{ error }}]</span>
+    {% endfor %}
+    {% for error in form.Quantity.errors %}
+    <span style="color: red;">[{{ error }}]</span>
+    {% endfor %}
+  </p>
+  <p>
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <ul>
+      {% for message in messages %}
+      <li>{{ message }}</li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+    {% endwith %}
+  </p>
+  <p>{{ form.submit() }}</p>
+</form>
+<a class="btn btn-secondary" href="{{ url_for('users.history') }}" role="button">Cancel</a>
+{% endblock %}

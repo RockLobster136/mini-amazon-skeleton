@@ -22,6 +22,11 @@
   <p>
     Address: {{address}}
   </p>
+  {% if isSeller %}
+  <p>This is your Seller's account</p>
+  {%else %}
+  <p> This is your Buyer's account <p>
+    {% endif %}
   <p>
     {% with messages = get_flashed_messages() %}
     {% if messages %}

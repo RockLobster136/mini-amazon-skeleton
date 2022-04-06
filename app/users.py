@@ -3,12 +3,13 @@ from werkzeug.urls import url_parse
 from flask_login import login_user, logout_user, current_user
 import datetime
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, DecimalField
-from wtforms.validators import ValidationError, DataRequired, Email, EqualTo
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, DecimalField,IntegerField
+from wtforms.validators import ValidationError, DataRequired, Email, EqualTo,NumberRange
 
 from .models.user import User
 from .models.purchase import Purchase
-
+from .models.product import Product
+from .models.inventory import Inventory
 from flask import Blueprint
 bp = Blueprint('users', __name__)
 
@@ -85,8 +86,9 @@ def info():
         email = current_user.email
         balance = current_user.balance
         address = current_user.address
+        isSeller = current_user.isSeller
         return render_template('info.html', accountnum = accountnum, firstname = firstname,
-        lastname = lastname, email = email, balance = balance, address = address)
+        lastname = lastname, email = email, balance = balance, address = address, isSeller = isSeller)
     else:
         return redirect(url_for('users.login'))
 
@@ -189,9 +191,51 @@ def fund():
 @bp.route('/history', methods=['GET','POST'])
 def history():
     if current_user.is_authenticated:
-        purchases = Purchase.get_all_by_uid_since(
-            current_user.id, datetime.datetime(1980, 9, 14, 0, 0, 0))
+        if current_user.isSeller:
+            print(1)
+            purchases = Inventory.get_all_by_uid_since(
+                current_user.id, datetime.datetime(1980, 9, 14, 0, 0, 0))
+            print(len(purchases))
+        else:
+            purchases = Purchase.get_all_by_uid_since(
+                current_user.id, datetime.datetime(1980, 9, 14, 0, 0, 0))
     else:
         purchases = None
     return render_template('history.html',
                            purchase_history=purchases)
+
+
+class InventoryForm(FlaskForm):
+    prodName = StringField('Product Name')
+    prodCat = IntegerField('Product Category')
+    Price = DecimalField('Price', 
+            validators=[DataRequired(), NumberRange(min=0, message='Can not enter negative number')])
+    Quantity = IntegerField('Quantity', 
+                validators=[DataRequired(), NumberRange(min=0, message='Can not enter negative number')])
+    newProd = BooleanField('This is new product')
+    submit = SubmitField('Commit')
+
+@bp.route('/history/addinventory', methods=['GET','POST'])
+def addinventory():
+    if current_user.is_authenticated:
+        form = InventoryForm()
+        if form.validate_on_submit():
+            sellerId = current_user.id
+            # This is new 
+            if form.newProd:
+                # insert product table
+                print(form.prodCat.data)
+                newid = Product.add_prod(form.prodName.data,form.prodCat.data)
+                if newid:
+                    flash("Successfully created a new product")
+                    if Inventory.add_inventory(sellerId,newid,form.Quantity.data,form.Price.data):
+                        flash("Successfully created new Inventory")
+                        return render_template('addinventory.html',form = form)
+                    else:
+                        flash("Error: no inventory update")
+                else:
+                    flash("Error")
+        return render_template('addinventory.html',form = form)
+
+    else:
+        return redirect(url_for('users.login'))

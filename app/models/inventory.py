@@ -1,19 +1,20 @@
 from flask import current_app as app
 
 class Inventory:
-    def __init__(self, id, sid, pid, quantity,price,release_date):
+    def __init__(self, id, sid, pid,name, quantity,price,release_date):
         self.id = id
         self.sid = sid
         self.pid = pid
+        self.name = name
         self.quantity = quantity
         self.price = price
         self.release_date = release_date
     @staticmethod
     def get(id):
         rows = app.db.execute('''
-SELECT id, sid, pid,quantity,price, release_date
-FROM Purchases
-WHERE id = :id
+SELECT I.id, I.sid, I.pid ,P.name ,I.quantity, I.price,I.release_date
+FROM Inventory I, Products P
+WHERE  I.pid = P.id AND I.id = :id
 ''',
                               id=id)
         return Inventory(*(rows[0])) if rows else None
@@ -30,7 +31,21 @@ RETURNING id
                                   quantity=quantity, 
                                   price=price )
             id = rows[0][0]
+            print(id)
+            print(sid)
+            print(Inventory.get(id).release_date)
             return Inventory.get(id)
         except Exception as e:
             print(str(e))
             return None
+    def get_all_by_uid_since(sid, since):
+        rows = app.db.execute('''
+SELECT I.id, I.sid, I.pid ,P.name ,I.quantity, I.price,I.release_date
+FROM Inventory I, Products P
+WHERE I.pid = P.id AND I.sid = :sid
+AND release_date >= :since
+ORDER BY release_date DESC
+''',
+                              sid=sid,
+                              since=since)
+        return [Inventory(*row) for row in rows]
