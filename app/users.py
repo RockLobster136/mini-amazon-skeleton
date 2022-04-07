@@ -192,17 +192,16 @@ def fund():
 def history():
     if current_user.is_authenticated:
         if current_user.isSeller:
-            print(1)
-            purchases = Inventory.get_all_by_uid_since(
+            record = Inventory.get_all_by_uid_since(
                 current_user.id, datetime.datetime(1980, 9, 14, 0, 0, 0))
-            print(len(purchases))
+            
         else:
-            purchases = Purchase.get_all_by_uid_since(
+            record = Purchase.get_all_by_uid_since(
                 current_user.id, datetime.datetime(1980, 9, 14, 0, 0, 0))
     else:
-        purchases = None
+        record = None
     return render_template('history.html',
-                           purchase_history=purchases)
+                           purchase_history=record)
 
 
 class InventoryForm(FlaskForm):
@@ -222,7 +221,7 @@ def addinventory():
         if form.validate_on_submit():
             sellerId = current_user.id
             # This is new 
-            if form.newProd:
+            if form.newProd.data:
                 # insert product table
                 print(form.prodCat.data)
                 newid = Product.add_prod(form.prodName.data,form.prodCat.data)
@@ -234,7 +233,16 @@ def addinventory():
                     else:
                         flash("Error: no inventory update")
                 else:
-                    flash("Error")
+                    flash("Error: product exists")
+            else:
+                pid = Product.prod_find(form.prodName.data)
+                if pid:
+                    if Inventory.update_inventory(sellerId,pid,form.prodName.data,form.Quantity.data,form.Price.data):
+                        flash("Successfully updated Inventory")
+                else:
+                    flash("No product found. Please add new product")
+
+
         return render_template('addinventory.html',form = form)
 
     else:

@@ -1,10 +1,12 @@
+from unicodedata import category
 from flask import current_app as app
 
 class Inventory:
-    def __init__(self, id, sid, pid,name, quantity,price,release_date):
+    def __init__(self, id, sid, pid,category,name, quantity,price,release_date):
         self.id = id
         self.sid = sid
         self.pid = pid
+        self.category = category
         self.name = name
         self.quantity = quantity
         self.price = price
@@ -12,7 +14,7 @@ class Inventory:
     @staticmethod
     def get(id):
         rows = app.db.execute('''
-SELECT I.id, I.sid, I.pid ,P.name ,I.quantity, I.price,I.release_date
+SELECT I.id, I.sid, I.pid ,P.category,P.name ,I.quantity, I.price,I.release_date
 FROM Inventory I, Products P
 WHERE  I.pid = P.id AND I.id = :id
 ''',
@@ -40,7 +42,7 @@ RETURNING id
             return None
     def get_all_by_uid_since(sid, since):
         rows = app.db.execute('''
-SELECT I.id, I.sid, I.pid ,P.name ,I.quantity, I.price,I.release_date
+SELECT I.id, I.sid, I.pid ,P.category,P.name ,I.quantity, I.price,I.release_date
 FROM Inventory I, Products P
 WHERE I.pid = P.id AND I.sid = :sid
 AND release_date >= :since
@@ -49,3 +51,15 @@ ORDER BY release_date DESC
                               sid=sid,
                               since=since)
         return [Inventory(*row) for row in rows]
+    def update_inventory(sid,pid,name,price,quantity):
+        rows = app.db.execute("""
+UPDATE Inventory
+SET price = :price, quantity =:quantity
+WHERE sid = :sid AND pid = :pid
+RETURNING id
+""",
+                              sid=sid,
+                              pid=pid,
+                              price = price,
+                              quantity = quantity)
+        return Inventory.get(rows[0][0])

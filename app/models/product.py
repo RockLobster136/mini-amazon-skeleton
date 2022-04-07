@@ -26,7 +26,7 @@ FROM Products
 '''
                               )
         return [Product(*row) for row in rows]
-
+    # add new kind of product
     def add_prod(name,category):
         try:
             rows = app.db.execute("""
@@ -40,10 +40,10 @@ RETURNING id
             id = rows[0][0]
             return id
         except Exception as e:
-            # likely email already in use; better error checking and reporting needed;
-            # the following simply prints the error to the console:
             print(str(e))
             return None
+
+    # check if prod name exist
     def prod_exist(name):
         rows = app.db.execute('''
 SELECT id
@@ -52,4 +52,16 @@ WHERE name = :name
 ''',
                               name=name)
         return len(rows) > 0
+    # find pid for product name
+    def prod_find(name):
+        rows = app.db.execute('''
+SELECT id
+FROM Products
+WHERE name = :name
+''',
+                              name=name)
+        if len(rows) == 0:
+            return None
+        return rows[0][0]
+
     
