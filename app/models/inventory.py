@@ -1,6 +1,5 @@
 from unicodedata import category
 from flask import current_app as app
-
 class Inventory:
     def __init__(self, id, sid, pid,category,name, quantity,price,release_date):
         self.id = id

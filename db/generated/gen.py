@@ -1,8 +1,8 @@
 from werkzeug.security import generate_password_hash
 import csv
 from faker import Faker
-import numpy as np
-
+import random
+# try
 num_users = 100
 num_products = 2000
 num_purchases = 2500
@@ -19,6 +19,8 @@ def gen_users(num_users):
     with open('Users.csv', 'w') as f:
         writer = get_csv_writer(f)
         print('Users...', end=' ', flush=True)
+        sellers = []
+        buyers = []
         for uid in range(num_users):
             if uid % 10 == 0:
                 print(f'{uid}', end=' ', flush=True)
@@ -29,10 +31,16 @@ def gen_users(num_users):
             name_components = profile['name'].split(' ')
             firstname = name_components[0]
             lastname = name_components[-1]
-            isSeller = np.random.binomial(1, 0.2, 1)[0]
-            writer.writerow([uid, email, password, firstname, lastname,isSeller])
+            isSeller =  fake.random_int(max=1)
+            balance = random.randint(20, 10000)
+            address = fake.address()
+            writer.writerow([uid, email, password, firstname, lastname,isSeller,balance,address])
+            if isSeller == 1:
+                sellers.append(uid)
+            else:
+                buyers.append(uid)
         print(f'{num_users} generated')
-    return
+    return [sellers,buyers]
 
 def gen_products(num_products):
     available_pids = []
@@ -52,7 +60,7 @@ def gen_products(num_products):
         print(f'{num_products} generated; {len(available_pids)} available')
     return available_pids
 
-def gen_purchases(num_purchases, available_pids):
+def gen_purchases(num_purchases, available_pids,available_sellers):
     with open('Purchases.csv', 'w') as f:
         writer = get_csv_writer(f)
         print('Purchases...', end=' ', flush=True)
@@ -61,6 +69,7 @@ def gen_purchases(num_purchases, available_pids):
                 print(f'{id}', end=' ', flush=True)
             uid = fake.random_int(min=0, max=num_users-1)
             pid = fake.random_element(elements=available_pids)
+            sid = fake.random_element(elements = available_sellers)
             time_purchased = fake.date_time()
             writer.writerow([id, uid, pid, time_purchased])
         print(f'{num_purchases} generated')
