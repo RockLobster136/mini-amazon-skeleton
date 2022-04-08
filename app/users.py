@@ -218,6 +218,7 @@ class InventoryForm(FlaskForm):
 def addinventory():
     if current_user.is_authenticated:
         form = InventoryForm()
+        # logic need rewrite
         if form.validate_on_submit():
             sellerId = current_user.id
             # This is new 
