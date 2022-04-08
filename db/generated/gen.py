@@ -5,7 +5,7 @@ import random
 # try
 
 
-num_users = 100
+num_users = 1000
 num_products = 2000
 num_purchases = 2500
 
