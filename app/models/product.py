@@ -20,7 +20,7 @@ WHERE id = :id
         return Product(*(rows[0])) if rows is not None else None
 
     @staticmethod
-    def get_all():
+    def get_all(available = True):
         rows = app.db.execute('''
 SELECT *
 FROM Products
@@ -69,6 +69,7 @@ WHERE name = :name
                               name=name)
         if len(rows) == 0:
             return None
-        return rows[0][0]
+        else:
+            return rows[0][0]
 
     

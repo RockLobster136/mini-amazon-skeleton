@@ -222,35 +222,28 @@ def addinventory():
         if form.validate_on_submit():
             sellerId = current_user.id
             # This is new 
-            newid = None
+            # if product not found
             if not Product.prod_exist(form.prodName.data):
-                newid = Product.add_prod(form.prodName.data,form.prodCat.data)
-            
-            if form.newProd.data:
-                # insert product table
-                print(form.prodCat.data)
-                #newid = Product.add_prod(form.prodName.data,form.prodCat.data)
-                if newid:
-                    flash("Successfully created a new product")
-                    if Inventory.add_inventory(sellerId,newid,form.Quantity.data,form.Price.data):
-                        flash("Successfully created new Inventory")
-                        return render_template('addinventory.html',form = form)
-                    else:
-                        flash("Error: no inventory update")
-                else:
-                    flash("product exists")
-                    if Inventory.add_inventory(sellerId,newid,form.Quantity.data,form.Price.data):
-                        flash("Successfully created new Inventory")
-                        return render_template('addinventory.html',form = form)
-                    else:
-                        flash("Error: no inventory update")
-            else:
-                pid = Product.prod_find(form.prodName.data)
+                # add product
+                pid = Product.add_prod(form.prodName.data,form.prodCat.data)
                 if pid:
-                    if Inventory.update_inventory(sellerId,pid,form.prodName.data,form.Quantity.data,form.Price.data):
+                    flash("Successfully created a new product")
+            else:
+                # find pid
+                pid = Product.prod_find(form.prodName.data)
+            # user want to insert inventory
+            if form.newProd.data:
+                if Inventory.add_inventory(sellerId,pid,form.Quantity.data,form.Price.data):
+                    flash("Successfully created new Inventory")
+                    return render_template('addinventory.html',form = form)
+                else:
+                    flash("Error: no inventory update. Your probably have created this inventory already.")
+            # update existing inventory
+            else:
+                if Inventory.update_inventory(sellerId,pid,form.prodName.data,form.Quantity.data,form.Price.data):
                         flash("Successfully updated Inventory")
                 else:
-                    flash("No product found. Please add new product")
+                    flash("Error. It does not match with any existing Inventory. Consider adding new inventory")
 
 
         return render_template('addinventory.html',form = form)
