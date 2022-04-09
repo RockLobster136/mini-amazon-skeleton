@@ -10,6 +10,7 @@ class Product:
         self.image = image
         self.available = available
 
+    # get single product by product id
     @staticmethod
     def get(id):
         rows = app.db.execute('''
@@ -20,6 +21,7 @@ WHERE id = :id
                               id=id)
         return Product(*(rows[0])) if rows is not None else None
 
+    # get all products (available)
     @staticmethod
     def get_all(available = True):
         rows = app.db.execute('''
