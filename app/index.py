@@ -12,6 +12,6 @@ bp = Blueprint('index', __name__)
 @bp.route('/')
 def index():
     # get all available products for sale:
-    products = Product.get_all()
+    products = Product.get_all(True)
     return render_template('index.html',
                            avail_products=products)

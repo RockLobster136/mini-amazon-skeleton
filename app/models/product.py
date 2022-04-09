@@ -19,13 +19,16 @@ WHERE id = :id
         return Product(*(rows[0])) if rows is not None else None
 
     @staticmethod
-    def get_all():
+    def get_all(available = True):
         rows = app.db.execute('''
 SELECT id, name, available, category
 FROM Products
-'''
-                              )
+WHERE available =: available
+''',
+                            available = available)
         return [Product(*row) for row in rows]
+    
+    
     # add new kind of product
     def add_prod(name,category):
         try:
@@ -52,6 +55,8 @@ WHERE name = :name
 ''',
                               name=name)
         return len(rows) > 0
+    
+    
     # find pid for product name
     def prod_find(name):
         rows = app.db.execute('''
