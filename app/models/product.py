@@ -2,11 +2,12 @@ from flask import current_app as app
 
 
 class Product:
-    def __init__(self, id, name, available, category):
+    def __init__(self, id, name, category, description, available):
         self.id = id
         self.name = name
-        self.available = available
         self.category = category
+        self.description = description
+        self.available = available
 
     @staticmethod
     def get(id):
@@ -19,13 +20,14 @@ WHERE id = :id
         return Product(*(rows[0])) if rows is not None else None
 
     @staticmethod
-    def get_all(available = True):
+    def get_all():
         rows = app.db.execute('''
-SELECT id, name, available, category
+SELECT *
 FROM Products
-WHERE available =: available
+WHERE available = :available
+ORDER BY id
 ''',
-                            available = available)
+                        available = available )
         return [Product(*row) for row in rows]
     
     
