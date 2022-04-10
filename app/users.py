@@ -10,6 +10,7 @@ from .models.user import User
 from .models.purchase import Purchase
 from .models.product import Product
 from .models.inventory import Inventory
+from .models.feedback import ProductFeedback
 from flask import Blueprint
 bp = Blueprint('users', __name__)
 
@@ -250,3 +251,27 @@ def addinventory():
 
     else:
         return redirect(url_for('users.login'))
+
+# Feedback
+
+class FeedbackForm(FlaskForm):
+    prodName = StringField('Product Name')
+    rating = IntegerField('Rating', 
+            validators=[DataRequired(), NumberRange(min=0, max=10, message='Input number between 0 and 10')])
+    review = StringField('Review')
+    submit = SubmitField('Commit')
+
+
+@bp.route('/feedback', methods=['GET','POST'])
+def feedback():
+    # retrive buyer's feedbacks
+    feedbacks = ProductFeedback.get_all_feedbacks(current_user.id)
+    return render_template('feedback.html',feedbacks = feedbacks)
+
+@bp.route('/feedback/add_feedback', methods=['GET','POST'])
+def add_feedback():
+    # retrive buyer's feedbacks
+    if current_user.is_authenticated:
+        form = FeedbackForm()
+    return render_template('add_feedback.html', form=form)
+
