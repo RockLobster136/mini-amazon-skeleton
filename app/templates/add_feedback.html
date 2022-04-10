@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h6>Manage your feedback here:</h6>
+
+<form action="" method="post" novalidate>
+    {{ form.hidden_tag() }}
+    <p>
+      {{ form.prodName.label }}<br/>
+      {{ form.prodName(size=32) }}<br/>
+      {{ form.rating.label }}<br/>
+      {{ form.rating(size=32) }}<br/>
+      {{ form.review.label }}<br/>
+      {{ form.review(size=64) }}<br/>
+    </p>
+    <p>{{ form.submit() }}</p>
+</form>
+<a class="btn btn-secondary" href="{{ url_for('users.feedback') }}" role="button">return</a>
+{% endblock %}
