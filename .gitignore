@@ -21,6 +21,8 @@ docs/_build/
 __pycache__/
 app/__pycache__/
 app/models/__pycache__/
+app/__pycache__/*
+app/models/__pycache__/*
 
 
 # Coverage reports
