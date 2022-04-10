@@ -2,7 +2,6 @@ from werkzeug.security import generate_password_hash
 import csv
 from faker import Faker
 import random
-# try
 
 
 num_users = 1000

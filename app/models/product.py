@@ -28,12 +28,33 @@ WHERE id = :id
 SELECT *
 FROM Products
 WHERE available = :available
-ORDER BY id
+ORDER BY name
 ''',
                         available = available )
         return [Product(*row) for row in rows]
     
-    
+    # search product by category
+    @staticmethod
+    def get_by_category(cat):
+        rows = app.db.execute('''
+SELECT *
+FROM Products
+WHERE category = :cat
+''',cat=cat)
+        return [Product(*row) for row in rows]
+
+    # search product by keyword
+    @staticmethod
+    def get_by_key(keyword):
+        input = "%{}%".format(keyword)
+        rows = app.db.execute('''
+                                SELECT *
+                                FROM Products
+                                WHERE LOWER(name) LIKE :keyword OR LOWER(description) LIKE :keyword
+                                ''',
+                              keyword=input)
+        return [Product(*row) for row in rows]
+
     # add new kind of product
     def add_prod(name,category,description, image, available):
         try:
