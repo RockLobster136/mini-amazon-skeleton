@@ -8,13 +8,30 @@ import random
 num_users = 1000
 num_products = 2000
 num_purchases = 2500
+num_categories = 20
 
-Faker.seed(0)
+Faker.seed(516)
 fake = Faker()
 
 
 def get_csv_writer(f):
     return csv.writer(f, dialect='unix')
+
+def gen_categories(num_categories):
+    categories = set()
+    with open('Categories.csv', 'w') as f:
+        writer = get_csv_writer(f)
+        print('Categories...', end=' ', flush=True)
+        for i in range(num_categories):
+            if i % 10 == 0:
+                print(f'{i}', end=' ', flush=True)
+            name = fake.word()
+            if name in categories:
+                continue
+            writer.writerow([name])
+            categories.add(name)
+        print(f'{num_categories} generated')
+    return list(categories)
 
 
 def gen_users(num_users):
@@ -44,7 +61,7 @@ def gen_users(num_users):
         print(f'{num_users} generated')
     return [sellers,buyers]
 
-def gen_products(num_products):
+def gen_products(num_products, categories):
     available_pids = []
     with open('Products.csv', 'w') as f:
         writer = get_csv_writer(f)
@@ -53,11 +70,13 @@ def gen_products(num_products):
             if pid % 100 == 0:
                 print(f'{pid}', end=' ', flush=True)
             name = fake.sentence(nb_words=4)[:-1]
+            category = fake.random_element(elements=categories)
+            description = fake.sentence(nb_words=10)
+            image = fake.image_url()
             #price = f'{str(fake.random_int(max=500))}.{fake.random_int(max=99):02}'
             available = fake.random_element(elements=('true', 'false'))
             if available == 'true':
                 available_pids.append(pid)
-            category = fake.random_int(max=10)
             writer.writerow([pid, name, available, category])
         print(f'{num_products} generated; {len(available_pids)} available')
     return available_pids

@@ -35,15 +35,18 @@ ORDER BY id
     
     
     # add new kind of product
-    def add_prod(name,category):
+    def add_prod(name,category,description, image, available):
         try:
             rows = app.db.execute("""
-INSERT INTO Products(name, category)
-VALUES(:name, :category)
+INSERT INTO Products(name, category, description, image, available)
+VALUES(:name, :category, :description, :image, :available)
 RETURNING id
 """,
                                   name=name,
-                                  category=category)
+                                  category=category,
+                                  description=description,
+                                  image=image,
+                                  available=available)
 
             id = rows[0][0]
             return id
