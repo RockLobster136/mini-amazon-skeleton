@@ -10,6 +10,7 @@ class Inventory:
         self.quantity = quantity
         self.price = price
         self.release_date = release_date
+    
     @staticmethod
     def get(id):
         rows = app.db.execute('''
@@ -19,6 +20,7 @@ WHERE  I.pid = P.id AND I.id = :id
 ''',
                               id=id)
         return Inventory(*(rows[0])) if rows else None
+    
     @staticmethod
     def add_inventory(sid,pid,quantity,price):
         try:
@@ -39,6 +41,7 @@ RETURNING id
         except Exception as e:
             print(str(e))
             return None
+    
     def get_all_by_uid_since(sid, since):
         rows = app.db.execute('''
 SELECT I.id, I.sid, I.pid ,P.category,P.name ,I.quantity, I.price,I.release_date
@@ -50,6 +53,7 @@ ORDER BY release_date DESC
                               sid=sid,
                               since=since)
         return [Inventory(*row) for row in rows]
+    
     def update_inventory(sid,pid,name,price,quantity):
         rows = app.db.execute("""
 UPDATE Inventory
