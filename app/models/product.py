@@ -55,7 +55,7 @@ WHERE category = :cat
                               keyword=input)
         return [Product(*row) for row in rows]
 
-    # add new kind of product
+    # add new product
     def add_prod(name,category,description, image, available):
         try:
             rows = app.db.execute("""
@@ -70,9 +70,31 @@ RETURNING id
                                   available=available)
 
             id = rows[0][0]
+            print("Product added:", id, name, category, description, image, available)
             return id
         except Exception as e:
             print(str(e))
+            return None
+
+    # update product
+    @staticmethod
+    def update_prod(name, category, description, image, available):
+        try:
+            rows = app.db.execute("""
+    UPDATE Products
+    SET name = :name, description = :description, image = :image, price = :price, category = :category
+    WHERE creator_id = :creator_id
+    """,
+                                    name=name,
+                                    category=category,
+                                    description=description,
+                                    image=image,
+                                    available=available)
+            id = rows[0][0]
+            print("Product Updated:", id, name, category, description, image, available)
+            return
+        except Exception as e:
+            print(e)
             return None
 
     # check if prod name exist
