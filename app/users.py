@@ -212,17 +212,13 @@ class InventoryForm(FlaskForm):
             validators=[DataRequired(), NumberRange(min=0, message='Can not enter negative number')])
     Quantity = IntegerField('Quantity', 
                 validators=[DataRequired(), NumberRange(min=0, message='Can not enter negative number')])
-    newProd = BooleanField('This is new product')
     submit = SubmitField('Commit')
 
 @bp.route('/history/addinventory', methods=['GET','POST'])
 def addinventory():
-    if current_user.is_authenticated:
+    if current_user.is_authenticated and current_user.isSeller:
         form = InventoryForm()
-        # logic need rewrite
-        if form.validate_on_submit():
-            sellerId = current_user.id
-            # This is new 
+        if form.validate_on_submit:
             # if product not found
             if not Product.prod_exist(form.prodName.data):
                 # add product
@@ -232,25 +228,26 @@ def addinventory():
             else:
                 # find pid
                 pid = Product.prod_find(form.prodName.data)
-            # user want to insert inventory
-            if form.newProd.data:
+            sellerId = current_user.id
+            if form.Quantity.data:
                 if Inventory.add_inventory(sellerId,pid,form.Quantity.data,form.Price.data):
-                    flash("Successfully created new Inventory")
-                    return render_template('addinventory.html',form = form)
+                        flash("Successfully created new Inventory")
+                        return render_template('addinventory.html',form = form)
                 else:
                     flash("Error: no inventory update. Your probably have created this inventory already.")
-            # update existing inventory
-            else:
-                if Inventory.update_inventory(sellerId,pid,form.prodName.data,form.Quantity.data,form.Price.data):
-                        flash("Successfully updated Inventory")
-                else:
-                    flash("Error. It does not match with any existing Inventory. Consider adding new inventory")
-
-
         return render_template('addinventory.html',form = form)
-
     else:
         return redirect(url_for('users.login'))
+
+@bp.route("/history/<iid>",methods=['GET','POST'])
+def update_inventory(iid = None):
+    form = InventoryForm()
+    if form.validate_on_submit:
+        if iid and form.Price.data and form.Quantity.data:
+            if Inventory.update_inventory(iid,form.Price.data,form.Quantity.data):
+                flash("Successfully created this Inventory")
+                return render_template("update.html",form = form)
+    return render_template("update.html",form = form)
 
 # Feedback
 
