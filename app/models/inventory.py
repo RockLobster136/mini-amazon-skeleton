@@ -23,12 +23,18 @@ WHERE  I.pid = P.id AND I.id = :id
     
     @staticmethod
     def add_inventory(sid,pid,quantity,price):
+        num = app.db.execute("""
+        SELECT COUNT(1) FROM Inventory
+        """
+        )
+        next_id = num[0][0]
         try:
             rows = app.db.execute("""
-INSERT INTO Inventory(sid, pid, quantity, price)
-VALUES(:sid, :pid, :quantity, :price)
+INSERT INTO Inventory(id,sid, pid, quantity, price)
+VALUES(:id,:sid, :pid, :quantity, :price)
 RETURNING id
 """,
+                                  id = next_id,
                                   sid=sid,
                                   pid=pid,
                                   quantity=quantity, 
@@ -54,15 +60,14 @@ ORDER BY release_date DESC
                               since=since)
         return [Inventory(*row) for row in rows]
     
-    def update_inventory(sid,pid,name,price,quantity):
+    def update_inventory(id,price,quantity):
         rows = app.db.execute("""
 UPDATE Inventory
 SET price = :price, quantity =:quantity
-WHERE sid = :sid AND pid = :pid
+WHERE id = :id
 RETURNING id
 """,
-                              sid=sid,
-                              pid=pid,
+                              id = id,
                               price = price,
                               quantity = quantity)
         return Inventory.get(rows[0][0])

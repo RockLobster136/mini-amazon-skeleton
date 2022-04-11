@@ -2,11 +2,11 @@ from flask import current_app as app
 
 
 class Product:
-    def __init__(self, id, name, category, description, image=None, available=None):
+    def __init__(self, id, name, category,description, image=None, available=None):
         self.id = id
         self.name = name
-        self.category = category
         self.description = description
+        self.category = category
         self.image = image
         self.available = available
 
@@ -25,12 +25,13 @@ WHERE id = :id
     @staticmethod
     def get_all(available = True):
         rows = app.db.execute('''
-SELECT *
+SELECT id,name,category,description,image,available
 FROM Products
 WHERE available = :available
 ORDER BY name
 ''',
                         available = available )
+        print(rows[0])
         return [Product(*row) for row in rows]
     
     # search product by category
@@ -56,7 +57,7 @@ WHERE category = :cat
         return [Product(*row) for row in rows]
 
     # add new product
-    def add_prod(name,category,description, image, available):
+    def add_prod(name,category,description = None, image = None, available = True):
         try:
             rows = app.db.execute("""
 INSERT INTO Products(name, category, description, image, available)
@@ -78,7 +79,7 @@ RETURNING id
 
     # update product
     @staticmethod
-    def update_prod(name, category, description, image, available):
+    def update_prod(name, category, description =None, image = None, available = True):
         try:
             rows = app.db.execute("""
     UPDATE Products
