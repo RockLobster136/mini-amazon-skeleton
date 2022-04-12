@@ -1,6 +1,7 @@
 from ast import Delete
 from email.policy import default
 from secrets import choice
+from django.shortcuts import render
 from flask import render_template, redirect, url_for, flash, request
 from werkzeug.urls import url_parse
 from flask_login import login_user, logout_user, current_user
@@ -254,6 +255,41 @@ def update_inventory(iid = None):
                     return render_template("update.html",form = form)
     return render_template("update.html",form = form)
 
+
+@bp.route('/orders', methods=['GET','POST'])
+def orders():
+    if current_user.is_authenticated:
+        if current_user.isSeller:
+            record = Purchase.get_seller_orders(
+                current_user.id, datetime.datetime(1980, 9, 14, 0, 0, 0))
+            for r in record:
+                if Purchase.check_order_fulfill(r.order_id,current_user.id):
+                    r.batch_status = True
+        else:
+            record = Purchase.get_all_by_uid_since(
+                current_user.id, datetime.datetime(1980, 9, 14, 0, 0, 0))
+    else:
+        record = None
+    return render_template('orders.html',
+                           purchase_history=record)
+
+class OrderForm(FlaskForm):
+    cancelOrder = SelectField("Cancel this Order", choices = ["No","Yes"])
+    fulfillOrder = SelectField("Fulfill this Order", choices = ["No","Yes"])
+    submit = SubmitField('Commit')
+@bp.route('/orders/manage/<oid>', methods=['GET','POST'])
+
+def manage_orders(oid = None):
+    form = OrderForm()
+    if form.validate_on_submit():
+        if oid: 
+            if form.fulfillOrder.data == "Yes":
+                if Purchase.fulfill_item(oid):
+                    flash("Successfully Fulfill")
+
+
+            return render_template("manageorders.html",form = form)
+    return render_template("manageorders.html",form = form)
 
 
 # Feedback

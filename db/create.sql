@@ -35,8 +35,10 @@ CREATE TABLE Purchases (
     quantity INT NOT NULL CHECK (quantity >= 0), -- quant ordered
     price DECIMAL(12,2) NOT NULL ,-- price sold/bought
     order_id INT NOT NULL,
-    order_status BOOLEAN DEFAULT FALSE 
+    order_status BOOLEAN DEFAULT FALSE,
+    fulfill_date timestamp without time zone DEFAULT(current_timestamp AT TIME ZONE 'UTC')
 );
+
 
 -- purchase THEN order
 --CREATE TABLE Order(

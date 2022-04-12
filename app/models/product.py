@@ -31,7 +31,6 @@ WHERE available = :available
 ORDER BY name
 ''',
                         available = available )
-        print(rows[0])
         return [Product(*row) for row in rows]
     
     # search product by category

@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<br><br>
+{% if current_user.is_authenticated and current_user.isSeller %}
+<h3>Your Orders:</h3>
+<table class='table table-hover table-bordered container'>
+    <thead class="thead-dark">
+      <tr>
+        <th scope="col">Order ID</th>
+        <th scope="col">Item Fulfillment</th>
+        <th scope="col">Order Fulfillment</th>
+        <th scope="col">Buyer's Address</th>
+        <th scope="col">price</th>
+        <th scope="col">quantity</th>
+        <th scope="col">Product Name</th>
+        <th scope="col">Time</th>
+        <th scope="col">Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for purchase in purchase_history%}
+        <tr>
+          <th scope="row">{{purchase.order_id}}</th>
+          <td>{{purchase.order_status}}</td>
+          <td>{{purchase.batch_status}}</td>
+          <td>{{purchase.address}}</td>
+          <td>{{purchase.price}}</td>
+          <td>{{purchase.quantity}}</td>
+          <td>{{purchase.prodname}}</td>
+          <td>{{purchase.time_purchased}}</td>
+          <td> <a class="btn btn-secondary" 
+            href="{{ url_for('users.manage_orders',oid = purchase.id) }}" 
+            role="button">Manage Orders</a>
+            <a class="btn btn-secondary" 
+            href="{{ url_for('users.update_inventory',iid = purchase.id) }}" 
+            role="button">View Order Detail</a>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endif %}
+{% endblock %}
