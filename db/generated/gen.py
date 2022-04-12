@@ -65,6 +65,13 @@ def gen_users(num_users):
 
 def gen_products(num_products, categories):
     available_pids = []
+    user_ids = []
+
+    with open('Users.csv', newline='') as csvfile:
+        reader = csv.reader(csvfile, delimiter=',')
+        for row in reader:
+            user_ids.append(row[0])
+
     with open('Products.csv', 'w') as f:
         writer = get_csv_writer(f)
         print('Products...', end=' ', flush=True)
@@ -77,9 +84,10 @@ def gen_products(num_products, categories):
             price = f'{str(fake.random_int(max=500))}.{fake.random_int(max=99):02}'
             image = fake.image_url()
             available = fake.random_int(max=1)
+            creator_id = fake.random_element(elements=user_ids)
             if available == 1:
                 available_pids.append(pid)
-            writer.writerow([pid, name, category, description, price, image ,available])
+            writer.writerow([pid, name, category, description, price, image ,available,creator_id])
         print(f'{num_products} generated; {len(available_pids)} available')
     return available_pids
 
