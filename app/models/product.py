@@ -2,7 +2,7 @@ from flask import current_app as app
 
 
 class Product:
-    def __init__(self, id, name, category, description, price, image=None, available=None):
+    def __init__(self, id, name, category, description, price, image=None, available=None, creator_id=None):
         self.id = id
         self.name = name
         self.description = description
@@ -10,12 +10,13 @@ class Product:
         self.price = price
         self.image = image
         self.available = available
+        self.creator_id = creator_id
 
     # get single product by product id
     @staticmethod
     def get(id):
         rows = app.db.execute('''
-SELECT id,name,category,description,price,image,available
+SELECT id,name,category,description,price,image,available,creator_id
 FROM Products
 WHERE id = :id
 ''',
@@ -26,7 +27,7 @@ WHERE id = :id
     @staticmethod
     def get_all(available = True):
         rows = app.db.execute('''
-SELECT P.id,P.name,C.name,P.description,P.price,P.image,P.available
+SELECT P.id,P.name,C.name,P.description,P.price,P.image,P.available,P.creator_id
 FROM Products P, Categories C
 WHERE available = :available AND P.category = C.id
 ORDER BY P.name
@@ -64,7 +65,7 @@ ORDER BY P.name
         return [Product(*row) for row in rows]
 
     # add new product
-    def add_prod(name,category,description = None, price = None, image = None, available = True):
+    def add_prod(name,category,description = None, price = None, image = None, available = True, creator_id = None):
         try:
             rows = app.db.execute("""
 INSERT INTO Products(name, category, description, price, image, available)
@@ -76,10 +77,11 @@ RETURNING id
                                   description=description,
                                   price = price,
                                   image=image,
-                                  available=available)
+                                  available=available,
+                                  creator_id=creator_id)
 
             id = rows[0][0]
-            print("Product added:", id, name, category, description, image, available)
+            print("Product added:", id, name, category, description, image, available,creator_id)
             return id
         except Exception as e:
             print(str(e))
@@ -87,7 +89,7 @@ RETURNING id
 
     # update product
     @staticmethod
-    def update_prod(name, category, description =None, image = None, available = True):
+    def update_prod(name, category, description =None, image = None, available = True, creator_id):
         try:
             rows = app.db.execute("""
     UPDATE Products
@@ -98,9 +100,10 @@ RETURNING id
                                     category=category,
                                     description=description,
                                     image=image,
-                                    available=available)
+                                    available=available,
+                                    creator_id=creator_id)
             id = rows[0][0]
-            print("Product Updated:", id, name, category, description, image, available)
+            print("Product Updated:", id, name, category, description, image, available, creator_id)
             return
         except Exception as e:
             print(e)

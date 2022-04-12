@@ -23,7 +23,8 @@ CREATE TABLE Products (
     description VARCHAR(300) NOT NULL,
     price DECIMAL(12,2) NOT NULL,
     image VARCHAR(500) NOT NULL,
-    available BOOLEAN DEFAULT TRUE
+    available BOOLEAN DEFAULT TRUE,
+    creator_id INT NOT NULL REFERENCES Users(id)
 );
 
 CREATE TABLE Purchases (
