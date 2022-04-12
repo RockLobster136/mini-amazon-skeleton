@@ -19,6 +19,7 @@ _mailinglist
 docs/_build/
 .vscode
 __pycache__/
+__pycache__/*
 app/__pycache__/
 app/models/__pycache__/
 app/__pycache__/*

@@ -72,12 +72,12 @@ def gen_products(num_products, categories):
             name = fake.sentence(nb_words=4)[:-1]
             category = fake.random_int(min = 0,max = num_categories-1)
             description = fake.sentence(nb_words=10)
+            price = f'{str(fake.random_int(max=500))}.{fake.random_int(max=99):02}'
             image = fake.image_url()
-            #price = f'{str(fake.random_int(max=500))}.{fake.random_int(max=99):02}'
             available = fake.random_int(max=1)
             if available == 1:
                 available_pids.append(pid)
-            writer.writerow([pid, name, description,image ,available, category])
+            writer.writerow([pid, name, category, description, price, image ,available])
         print(f'{num_products} generated; {len(available_pids)} available')
     return available_pids
 
@@ -126,3 +126,4 @@ available_pids = gen_products(num_products,categories)
 available_sellers = users[0]
 gen_purchases(num_purchases, available_pids,available_sellers)
 gen_inventory(available_sellers,num_inventories)
+#test push

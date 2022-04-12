@@ -2,11 +2,12 @@ from flask import current_app as app
 
 
 class Product:
-    def __init__(self, id, name, category,description, image=None, available=None):
+    def __init__(self, id, name, category, description, price, image=None, available=None):
         self.id = id
         self.name = name
         self.description = description
         self.category = category
+        self.price = price
         self.image = image
         self.available = available
 
@@ -14,7 +15,7 @@ class Product:
     @staticmethod
     def get(id):
         rows = app.db.execute('''
-SELECT id, name, available, category
+SELECT id,name,category,description,price,image,available
 FROM Products
 WHERE id = :id
 ''',
@@ -25,7 +26,7 @@ WHERE id = :id
     @staticmethod
     def get_all(available = True):
         rows = app.db.execute('''
-SELECT id,name,category,description,image,available
+SELECT id,name,category,description,price,image,available
 FROM Products
 WHERE available = :available
 ORDER BY name
@@ -49,6 +50,7 @@ ORDER BY name
         if rows and len(rows) != 0:
             return [row[0] for row in rows]
         return None
+
     # search product by keyword
     @staticmethod
     def get_by_key(keyword):
@@ -62,16 +64,17 @@ ORDER BY name
         return [Product(*row) for row in rows]
 
     # add new product
-    def add_prod(name,category,description = None, image = None, available = True):
+    def add_prod(name,category,description = None, price = None, image = None, available = True):
         try:
             rows = app.db.execute("""
-INSERT INTO Products(name, category, description, image, available)
-VALUES(:name, :category, :description, :image, :available)
+INSERT INTO Products(name, category, description, price, image, available)
+VALUES(:name, :category, :description, :price, :image, :available)
 RETURNING id
 """,
                                   name=name,
                                   category=category,
                                   description=description,
+                                  price = price,
                                   image=image,
                                   available=available)
 
