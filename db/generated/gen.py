@@ -126,3 +126,4 @@ available_pids = gen_products(num_products,categories)
 available_sellers = users[0]
 gen_purchases(num_purchases, available_pids,available_sellers)
 gen_inventory(available_sellers,num_inventories)
+#test push
