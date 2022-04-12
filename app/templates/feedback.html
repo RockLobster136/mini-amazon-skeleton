@@ -9,37 +9,64 @@
 {% elif current_user.is_authenticated %}
 <h6>Your Feedbacks:</h6>
 
-<a class="btn btn-secondary" href="{{ url_for('users.add_feedback') }}" role="button">Manage Your Seller Feedback</a>
+<a class="btn btn-secondary" href="{{ url_for('users.add_feedback', isseller='Yes') }}" role="button">Manage Your Seller Feedback</a>
 <table class='table table-hover table-bordered container'>
     <thead class="thead-dark">
       <tr>
-        <th scope="col">Seller</th>
+        <th scope="col">Seller Name</th>
         <th scope="col">Rating</th>
         <th scope="col">Review</th>
+        <th scope="col">Upvote</th>
         <th scope="col">Date</th>
+        <th scope="col">Action</th>
       </tr>
     </thead>
     <tbody>
-    --> for loop here
-    {%feedback in feedbacks%}
+      {% for feedback in seller_feedbacks %}
+        <tr>
+          <th scope="row">{{feedback.seller_name}}</th>
+          <td>{{feedback.rating}}</td>
+          <td>{{feedback.review}}</td>
+          <td>{{feedback.upvotes}}</td>
+          <td>{{feedback.time_feedback}}</td>
+          <td> <a class="btn btn-secondary" 
+            href="{{ url_for('users.edit_feedback',feedback_id = feedback.id, isseller = 'Yes') }}" 
+            role="button">Update feedback</a>
+          </td>
+        </tr>
+      {% endfor %}
     <tr>
     </tr>
     
     </tbody>
 </table>
 
-<a class="btn btn-secondary" href="{{ url_for('users.add_feedback') }}" role="button">Manage Your Product Feedback</a>
+<a class="btn btn-secondary" href="{{ url_for('users.add_feedback', isseller='No') }}" role="button">Manage Your Product Feedback</a>
 <table class='table table-hover table-bordered container'>
     <thead class="thead-dark">
       <tr>
         <th scope="col">Product Name</th>
         <th scope="col">Rating</th>
         <th scope="col">Review</th>
+        <th scope="col">Upvote</th>
         <th scope="col">Date</th>
+        <th scope="col">Action</th>
       </tr>
     </thead>
     <tbody>
-    --> for loop here
+      {% for feedback in product_feedbacks %}
+        <tr>
+          <th scope="row">{{feedback.product_name}}</th>
+          <td>{{feedback.rating}}</td>
+          <td>{{feedback.review}}</td>
+          <td>{{feedback.upvotes}}</td>
+          <td>{{feedback.time_feedback}}</td>
+          <td> <a class="btn btn-secondary" 
+            href="{{ url_for('users.edit_feedback',feedback_id = feedback.id, isseller = 'No') }}" 
+            role="button">Update feedback</a>
+          </td>
+        </tr>
+      {% endfor %}
     </tbody>
 </table>
 

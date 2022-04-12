@@ -117,3 +117,17 @@ WHERE id = :id
                               id=id,
                               balance = balance)
         return User.get(id)
+
+
+    @staticmethod
+    def get_user_name(id):
+        rows = app.db.execute("""
+        SELECT CONCAT(Users.firstname, ' ', Users.lastname) AS seller_name
+        FROM Users
+        WHERE id = :id
+        """,
+        id = id)
+        if len(rows)>0:
+            return [row[0] for row in rows]
+        else:
+            return None

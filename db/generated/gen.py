@@ -10,6 +10,8 @@ num_products = 2000
 num_purchases = 2500
 num_categories = 20
 num_inventories = 5000
+num_ProductFeedback = 2000
+num_SellerFeedback = 200
 Faker.seed(516)
 fake = Faker()
 
@@ -119,11 +121,48 @@ def gen_inventory(available_sellers,num_inventories):
         print(f'{num_inventories} generated')
     return 
 
+def gen_ProductFeedback(num_ProductFeedback, available_products, available_buyers):
+    with open('ProductFeedback.csv', 'w') as f:
+        writer = get_csv_writer(f)
+        print('ProductFeedback...', end=' ', flush=True)
+        for id in range(num_ProductFeedback):
+            if id % 100 == 0:
+                print(f'{id}', end=' ', flush=True)
+            uid = fake.random_element(elements=available_buyers)
+            pid = fake.random_element(elements=available_products)
+            rating = fake.random_int(min = 1,max = 10)
+            review = fake.sentence(nb_words=50)
+            time_feedback = fake.date_time()
+            upvotes = fake.random_int(min = 1,max = 50)
+            writer.writerow([id, uid, pid, rating, review, time_feedback, upvotes])
+        print(f'{num_inventories} generated')
+    return 
+
+def gen_SellerFeedback(num_SellerFeedback, available_sellers, available_buyers):
+    with open('SellerFeedback.csv', 'w') as f:
+        writer = get_csv_writer(f)
+        print('SellerFeedback...', end=' ', flush=True)
+        for id in range(num_SellerFeedback):
+            if id % 100 == 0:
+                print(f'{id}', end=' ', flush=True)
+            uid = fake.random_element(elements=available_buyers)
+            sid = fake.random_element(elements=available_sellers)
+            rating = fake.random_int(min = 1,max = 10)
+            review = fake.sentence(nb_words=50)
+            time_feedback = fake.date_time()
+            upvotes = fake.random_int(min = 1,max = 50)
+            writer.writerow([id, uid, sid, rating, review, time_feedback, upvotes])
+        print(f'{num_inventories} generated')
+    return 
+
 
 users = gen_users(num_users)
 categories = gen_categories(num_categories)
 available_pids = gen_products(num_products,categories)
 available_sellers = users[0]
+available_buyers = users[1]
 gen_purchases(num_purchases, available_pids,available_sellers)
 gen_inventory(available_sellers,num_inventories)
+gen_ProductFeedback(num_ProductFeedback, available_pids, available_buyers)
+gen_SellerFeedback(num_SellerFeedback, available_sellers, available_buyers)
 #test push

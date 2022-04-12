@@ -16,6 +16,16 @@ SELECT pg_catalog.setval('public.purchases_id_seq',
 \COPY Categories FROM 'Categories.csv' WITH DELIMITER ',' NULL '' CSV
 
 \COPY Inventory FROM 'Inventory.csv' WITH DELIMITER ',' NULL '' CSV
-SELECT pg_catalog.setval('public.purchases_id_seq',
+SELECT pg_catalog.setval('public.inventory_id_seq',
                          (SELECT MAX(id)+1 FROM Inventory),
+                         false);
+
+\COPY ProductFeedback FROM 'ProductFeedback.csv' WITH DELIMITER ',' NULL '' CSV
+SELECT pg_catalog.setval('public.productfeedback_id_seq',
+                         (SELECT MAX(id)+1 FROM ProductFeedback),
+                         false);
+
+\COPY SellerFeedback FROM 'SellerFeedback.csv' WITH DELIMITER ',' NULL '' CSV
+SELECT pg_catalog.setval('public.sellerfeedback_id_seq',
+                         (SELECT MAX(id)+1 FROM SellerFeedback),
                          false);
