@@ -26,10 +26,10 @@ WHERE id = :id
     @staticmethod
     def get_all(available = True):
         rows = app.db.execute('''
-SELECT id,name,category,description,price,image,available
-FROM Products
-WHERE available = :available
-ORDER BY name
+SELECT P.id,P.name,C.name,P.description,P.price,P.image,P.available
+FROM Products P, Categories C
+WHERE available = :available AND P.category = C.id
+ORDER BY P.name
 ''',
                         available = available )
         return [Product(*row) for row in rows]
