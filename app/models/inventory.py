@@ -50,9 +50,9 @@ RETURNING id
     
     def get_all_by_uid_since(sid, since):
         rows = app.db.execute('''
-SELECT I.id, I.sid, I.pid ,P.category,P.name ,I.quantity, I.price,I.release_date
-FROM Inventory I, Products P
-WHERE I.pid = P.id AND I.sid = :sid
+SELECT I.id, I.sid, I.pid ,C.name,P.name ,I.quantity, I.price,I.release_date
+FROM Inventory I, Products P, Categories C
+WHERE I.pid = P.id AND I.sid = :sid AND P.category = C.id
 AND release_date >= :since
 ORDER BY release_date DESC
 ''',
@@ -70,4 +70,21 @@ RETURNING id
                               id = id,
                               price = price,
                               quantity = quantity)
-        return Inventory.get(rows[0][0])
+        if len(rows) > 0:
+            return Inventory.get(rows[0][0])
+        else:
+            return None
+    def delete_inventory(id):
+        rows = app.db.execute("""
+DELETE FROM Inventory
+WHERE id = :id
+RETURNING id
+""",
+                              id = id)
+        print(rows[0][0])
+        if len(rows) != 0:
+            return rows[0][0]
+        else:
+            return None
+        
+       

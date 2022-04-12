@@ -1,9 +1,12 @@
+from ast import Delete
+from email.policy import default
+from secrets import choice
 from flask import render_template, redirect, url_for, flash, request
 from werkzeug.urls import url_parse
 from flask_login import login_user, logout_user, current_user
 import datetime
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, DecimalField,IntegerField
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, DecimalField,IntegerField,SelectField
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo,NumberRange
 
 from .models.user import User
@@ -206,12 +209,13 @@ def history():
 
 
 class InventoryForm(FlaskForm):
-    prodName = StringField('Product Name')
-    prodCat = IntegerField('Product Category')
+    prodName = SelectField('Product Name',choices=[])
+    prodCat = SelectField('Product Category',choices=[])
     Price = DecimalField('Price', 
             validators=[DataRequired(), NumberRange(min=0, message='Can not enter negative number')])
     Quantity = IntegerField('Quantity', 
                 validators=[DataRequired(), NumberRange(min=0, message='Can not enter negative number')])
+    Delete =SelectField('Delete this Inventory', choices = ["No","Yes"], validators = [DataRequired()])
     submit = SubmitField('Commit')
 
 @bp.route('/history/addinventory', methods=['GET','POST'])
@@ -219,16 +223,12 @@ def addinventory():
     if current_user.is_authenticated and current_user.isSeller:
         form = InventoryForm()
         if form.validate_on_submit:
-            # if product not found
-            if not Product.prod_exist(form.prodName.data):
-                # add product
-                pid = Product.add_prod(form.prodName.data,form.prodCat.data)
-                if pid:
-                    flash("Successfully created a new product")
-            else:
-                # find pid
-                pid = Product.prod_find(form.prodName.data)
+            
+            form.prodCat.choices = Product.get_prod_cat()
+            if Product.get_by_category(form.prodCat.data):
+                form.prodName.choices = [product for product in Product.get_by_category(form.prodCat.data)]
             sellerId = current_user.id
+            pid = Product.prod_find(form.prodName.data)
             if form.Quantity.data:
                 if Inventory.add_inventory(sellerId,pid,form.Quantity.data,form.Price.data):
                         flash("Successfully created new Inventory")
@@ -239,15 +239,22 @@ def addinventory():
     else:
         return redirect(url_for('users.login'))
 
-@bp.route("/history/<iid>",methods=['GET','POST'])
+@bp.route("/history/update/<iid>",methods=['GET','POST'])
 def update_inventory(iid = None):
     form = InventoryForm()
     if form.validate_on_submit:
-        if iid and form.Price.data and form.Quantity.data:
-            if Inventory.update_inventory(iid,form.Price.data,form.Quantity.data):
-                flash("Successfully created this Inventory")
-                return render_template("update.html",form = form)
+        if iid:
+            if form.Delete.data == "Yes":
+                if Inventory.delete_inventory(iid):
+                    flash("Successfully delete this Inventory")
+                    return render_template("update.html",form = form)
+            elif form.Price.data and form.Quantity.data:
+                if Inventory.update_inventory(iid,form.Price.data,form.Quantity.data):
+                    flash("Successfully update this Inventory")
+                    return render_template("update.html",form = form)
     return render_template("update.html",form = form)
+
+
 
 # Feedback
 

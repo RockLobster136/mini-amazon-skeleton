@@ -11,6 +11,8 @@
     {{ form.Price(size=32) }}<br/>
     {{ form.Quantity.label }}<br/>
     {{ form.Quantity(size=32) }}<br/>
+    {{ form.Delete.label }}<br/>
+    {{ form.Delete(size=1) }}<br/>
     {% for error in form.Price.errors %}
     <span style="color: red;">[{{ error }}]</span>
     {% endfor %}

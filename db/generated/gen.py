@@ -28,7 +28,7 @@ def gen_categories(num_categories):
             name = fake.word()
             if name in categories:
                 continue
-            writer.writerow([name])
+            writer.writerow([i,name])
             categories.add(name)
         print(f'{num_categories} generated')
     return list(categories)

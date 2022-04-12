@@ -7,14 +7,18 @@
 <form action="" method="post" novalidate>
   {{ form.hidden_tag() }}
   <p>
-    {{ form.prodName.label }}<br/>
-    {{ form.prodName(size=32) }}<br/>
     {{ form.prodCat.label }}<br/>
-    {{ form.prodCat(size=32) }}<br/>
+    {{ form.prodCat(size=1) }}<br/>
+
+    {% if form.prodCat.data %}
+    {{ form.prodName.label }}<br/>
+    {{ form.prodName(size=10) }}<br/>
     {{ form.Price.label }}<br/>
     {{ form.Price(size=32) }}<br/>
     {{ form.Quantity.label }}<br/>
-    {{ form.Quantity(size=32) }}<br/>
+    {{ form.Quantity(size=32) }}<br/>  
+    {% endif %}
+  
     {% for error in form.Price.errors %}
     <span style="color: red;">[{{ error }}]</span>
     {% endfor %}

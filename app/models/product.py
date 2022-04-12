@@ -37,13 +37,19 @@ ORDER BY name
     # search product by category
     @staticmethod
     def get_by_category(cat):
-        rows = app.db.execute('''
-SELECT *
-FROM Products
-WHERE category = :cat
-''',cat=cat)
-        return [Product(*row) for row in rows]
-
+        if cat:
+            rows = app.db.execute('''
+    SELECT P.name
+    FROM Products P 
+    INNER JOIN Categories C
+    ON P.category = C.id
+    WHERE C.name = :cat
+    ''',cat=cat)
+        else:
+            return None
+        if rows and len(rows) != 0:
+            return [row[0] for row in rows]
+        return None
     # search product by keyword
     @staticmethod
     def get_by_key(keyword):
@@ -121,5 +127,14 @@ WHERE name = :name
             return None
         else:
             return rows[0][0]
+    
+    def get_prod_cat():
+        rows = app.db.execute('''
+SELECT *
+FROM Categories
+''')    
+        return [row[1] for row in rows]
+
+
 
     
