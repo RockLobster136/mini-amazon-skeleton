@@ -302,9 +302,12 @@ class FeedbackForm(FlaskForm):
 @bp.route('/feedback', methods=['GET','POST'])
 def feedback():
     # retrive buyer's feedbacks
-    product_feedbacks = ProductFeedback.get_all_feedbacks(current_user.id)
-    seller_feedbacks = SellerFeedback.get_all_feedbacks(current_user.id)
-    return render_template('feedback.html', product_feedbacks = product_feedbacks, seller_feedbacks = seller_feedbacks)
+    if current_user.is_authenticated:
+        product_feedbacks = ProductFeedback.get_all_feedbacks(current_user.id)
+        seller_feedbacks = SellerFeedback.get_all_feedbacks(current_user.id)
+        return render_template('feedback.html', product_feedbacks = product_feedbacks, seller_feedbacks = seller_feedbacks)
+    else:
+        return render_template('feedback.html', product_feedbacks = None, seller_feedbacks = None)
 
 @bp.route('/feedback/add_feedback/<isseller>', methods=['GET','POST'])
 def add_feedback(isseller =None):
@@ -329,7 +332,9 @@ def add_feedback(isseller =None):
                 pid = Product.prod_find(form.prodName.data)
                 if ProductFeedback.add_feedback(current_user.id, pid, form.rating.data, form.review.data):
                     flash("Succesfully added review!")
-    return render_template('add_feedback.html', form=form,isseller = isseller)
+        return render_template('add_feedback.html', form=form,isseller = isseller)
+    else:
+        return render_template('add_feedback.html', form=None,isseller = None)
 
 @bp.route('/feedback/edit_feedback/<feedback_id>-<isseller>', methods=['GET','POST'])
 def edit_feedback(feedback_id = None, isseller = None):
