@@ -97,7 +97,8 @@ def gen_purchases(num_purchases, available_pids,available_sellers):
             price = fake.random_int(min = 1,max = 10000)
             order_id = fake.random_int(min = 1, max = num_purchases//3)
             order_status = 0
-            writer.writerow([id, uid, pid,sid, time_purchased,quantity,price,order_id,order_status])
+            fulfill_date = fake.date_time()
+            writer.writerow([id, uid, pid,sid, time_purchased,quantity,price,order_id,order_status,fulfill_date])
             purchaseId.append(id)
         print(f'{num_purchases} generated')
     return purchaseId
