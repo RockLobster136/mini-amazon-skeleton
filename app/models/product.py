@@ -89,7 +89,7 @@ RETURNING id
 
     # update product
     @staticmethod
-    def update_prod(name, category, description =None, image = None, available = True, creator_id):
+    def update_prod(name, category, description =None, image = None, available = True, creator_id = None):
         try:
             rows = app.db.execute("""
     UPDATE Products
