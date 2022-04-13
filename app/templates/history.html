@@ -8,6 +8,7 @@
 <h6>Your Inventory:</h6>
 
 <a class="btn btn-secondary" href="{{ url_for('users.addinventory') }}" role="button">Add Inventory</a>
+<a class="btn btn-secondary" href="{{ url_for('users.addinventory') }}" role="button">Inventory Insights</a>
 <table class='table table-hover table-bordered container'>
   <thead class="thead-dark">
     <tr>
@@ -37,34 +38,47 @@
   </tbody>
 </table>
 
-{%else%}
-<p><a href="{{ url_for('users.login') }}">Log in</a> to see your purchase history!</p>
 
-{% endif %}
 
 <br><br>
-{% if current_user.is_authenticated %}
+{% elif current_user.is_authenticated %}
 <h6>Your Recent Purchases:</h6>
 <table class='table table-hover table-bordered container'>
   <thead class="thead-dark">
     <tr>
       <th scope="col">Product Category</th>
       <th scope="col">Product Name</th>
-      <th scope="col">Seller</th>
+      <th scope="col">Quantity</th>
       <th scope="col">Price</th>
       <th scope="col">Quantity</th>
+<<<<<<< HEAD
       <th scope="col">Date</th>
       <th scope="col">Review</th>
+=======
+      <th scope="col">Fulfillment Status</th>
+      <th scope="col">Order Time</th>
+>>>>>>> 67b9a7272e114ce949acf0396105ae7fc4dba432
     </tr>
   </thead>
   <tbody>
     {% for purchase in purchase_history%}
       <tr>
+<<<<<<< HEAD
       	<th scope="row">{{purchase.category}}</th>
         <td>{{purchase.name}}</td>
         <td>{{purchase.price}}</td>
         <td>{{purchase.quantity}}</td>
         <td>{{purchase.release_date}}</td>
+=======
+        <th scope="row">{{purchase.podcat}}</th>
+        <td>{{purchase.prodname}}</td>
+        <td>{{purchase.quantity}}</td>
+        <td>{{purchase.price}}</td>
+        <td>{{purchase.time_purchased}}</td>
+        <td>{{purchase.order_status}}</td>
+        <td>{{purchase.time_purchased}}</td>
+        
+>>>>>>> 67b9a7272e114ce949acf0396105ae7fc4dba432
       </tr>
     {% endfor %}
   </tbody>
@@ -73,5 +87,9 @@
 <p><a href="{{ url_for('users.login') }}">Log in</a> to see your purchase history!</p>
 
 {% endif %}
+
+
+
+
 
 {% endblock %}

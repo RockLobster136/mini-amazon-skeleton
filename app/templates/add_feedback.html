@@ -1,19 +1,39 @@
 {% extends "base.html" %}
 
 {% block content %}
-
-<h6>Manage your feedback here:</h6>
-
+{% if isseller == 'Yes' %}
+<h6>Manage your Seller feedback here:</h6>
+{% else %}
+<h6>Manage your Product feedback here:</h6>
+{% endif %}
 <form action="" method="post" novalidate>
     {{ form.hidden_tag() }}
     <p>
+      {% if isseller == 'Yes' %}
+      {{ form.sellerName.label }}<br/>
+      {{ form.sellerName(size=1) }}<br/>
+      {% else %}
       {{ form.prodName.label }}<br/>
-      {{ form.prodName(size=32) }}<br/>
+      {{ form.prodName(size=1) }}<br/>
+      {% endif %}
       {{ form.rating.label }}<br/>
-      {{ form.rating(size=32) }}<br/>
+      {{ form.rating(size=1) }}<br/>
       {{ form.review.label }}<br/>
       {{ form.review(size=64) }}<br/>
     </p>
+
+    <p>
+      {% with messages = get_flashed_messages() %}
+      {% if messages %}
+      <ul>
+        {% for message in messages %}
+        <li>{{ message }}</li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+      {% endwith %}
+    </p>
+
     <p>{{ form.submit() }}</p>
 </form>
 <a class="btn btn-secondary" href="{{ url_for('users.feedback') }}" role="button">return</a>

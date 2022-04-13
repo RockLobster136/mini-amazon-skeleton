@@ -119,6 +119,7 @@ WHERE id = :id
                               balance = balance)
         return User.get(id)
 
+<<<<<<< HEAD
     @staticmethod
     def search_pur(id, search, sort_by, val_l, val_h, d_l, d_h):
         rows = app.db.execute("""
@@ -139,3 +140,18 @@ ORDER BY :sort_by DESC, order_id""",
                               d_l = d_l,
                               d_h = d_h)
         return [User(*row) for row in rows]
+=======
+
+    @staticmethod
+    def get_user_name(id):
+        rows = app.db.execute("""
+        SELECT CONCAT(Users.firstname, ' ', Users.lastname) AS seller_name
+        FROM Users
+        WHERE id = :id
+        """,
+        id = id)
+        if len(rows)>0:
+            return [row[0] for row in rows]
+        else:
+            return None
+>>>>>>> 67b9a7272e114ce949acf0396105ae7fc4dba432
