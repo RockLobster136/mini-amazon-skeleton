@@ -11,12 +11,7 @@ from .models.user import User
 from .models.purchase import Purchase
 from .models.product import Product
 from .models.inventory import Inventory
-<<<<<<< HEAD
-from .models.feedback import ProductFeedback
-
-=======
 from .models.feedback import ProductFeedback, SellerFeedback
->>>>>>> 67b9a7272e114ce949acf0396105ae7fc4dba432
 from flask import Blueprint
 bp = Blueprint('users', __name__)
 

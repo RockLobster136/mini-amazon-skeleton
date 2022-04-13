@@ -119,7 +119,6 @@ WHERE id = :id
                               balance = balance)
         return User.get(id)
 
-<<<<<<< HEAD
     @staticmethod
     def search_pur(id, search, sort_by, val_l, val_h, d_l, d_h):
         rows = app.db.execute("""
@@ -134,13 +133,12 @@ AND time_purchased >= :d_l AND time_purchased <= :d_h
 ORDER BY :sort_by DESC, order_id""",
                               id = id,
                               search = search,
-                              sort_by = sort_by
+                              sort_by = sort_by,
                               val_l = val_l,
                               val_h = val_h,
                               d_l = d_l,
                               d_h = d_h)
         return [User(*row) for row in rows]
-=======
 
     @staticmethod
     def get_user_name(id):
@@ -154,4 +152,3 @@ ORDER BY :sort_by DESC, order_id""",
             return [row[0] for row in rows]
         else:
             return None
->>>>>>> 67b9a7272e114ce949acf0396105ae7fc4dba432
