@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h3>Your History:</h3>
+<h3>Your History:  <a class="btn btn-secondary" href="{{ url_for('users.search') }}" role="button">Advance Search</a></h3>
 
 <br><br>
 {% if current_user.is_authenticated and current_user.isSeller %}
@@ -53,15 +53,18 @@
       <th scope="col">Seller</th>
       <th scope="col">Price</th>
       <th scope="col">Quantity</th>
+      <th scope="col">Date</th>
       <th scope="col">Review</th>
     </tr>
   </thead>
   <tbody>
     {% for purchase in purchase_history%}
       <tr>
-        <th scope="row">{{purchase.id}}</th>
-        <td>{{purchase.pid}}</td>
-        <td>{{purchase.time_purchased}}</td>
+      	<th scope="row">{{purchase.category}}</th>
+        <td>{{purchase.name}}</td>
+        <td>{{purchase.price}}</td>
+        <td>{{purchase.quantity}}</td>
+        <td>{{purchase.release_date}}</td>
       </tr>
     {% endfor %}
   </tbody>

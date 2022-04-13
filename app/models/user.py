@@ -1,4 +1,5 @@
 from flask_login import UserMixin
+import datetime
 from flask import current_app as app
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -117,3 +118,24 @@ WHERE id = :id
                               id=id,
                               balance = balance)
         return User.get(id)
+
+    @staticmethod
+    def search_pur(id, search, sort_by, val_l, val_h, d_l, d_h):
+        rows = app.db.execute("""
+SELECT Pro.name as name, Pro.category as category, Pur.price as price, Pur.quantity as quantity, Pur.time_purchased as date_pur, Pur.sid as seller
+FROM Purchases Pur
+JOIN Products Pro
+ON Pur.pid = Pro.id
+WHERE Pur.uid = :id
+AND Pro.name LIKE '%':search'%'
+AND Pur.price >= :val_l AND Pur.price <= :val_h
+AND time_purchased >= :d_l AND time_purchased <= :d_h
+ORDER BY :sort_by DESC, order_id""",
+                              id = id,
+                              search = search,
+                              sort_by = sort_by
+                              val_l = val_l,
+                              val_h = val_h,
+                              d_l = d_l,
+                              d_h = d_h)
+        return [User(*row) for row in rows]

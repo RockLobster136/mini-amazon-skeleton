@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h3></h3>
+
+<form action="" method="post">
+  {{ form.hidden_tag() }}
+  <p>
+    {{ form.search_name.label }}
+    {{ form.search_name(size=32) }}<br/>
+    {{ form.sort_by.label }}<br/>
+    {{ form.sort_by(size=2) }}<br/>
+
+    {% for error in form.search_name.errors %}
+    <span style="color: red;">[{{ error }}]</span>
+    {% endfor %}
+    {% for error in form.sort_by.errors %}
+    <span style="color: red;">[{{ error }}]</span>
+    {% endfor %}
+  </p>
+  <p>
+    {{ form.value_l.label }}
+    {{ form.value_l(size=32) }}<br/>
+
+    {{ form.value_h.label }}
+    {{ form.value_h(size=32) }}<br/>
+  </p>
+  <p>
+    {{ form.date_l.label }}
+    {{ form.date_l(size=32) }}<br/>
+
+    {{ form.date_h.label }}
+    {{ form.date_h(size=32) }}<br/>
+  </p>
+  <p>{{ form.submit() }}</p>
+</form>
+
+<a class="btn btn-secondary" href="{{ url_for('users.history') }}" role="button">Cancel</a>
+{% endblock %}

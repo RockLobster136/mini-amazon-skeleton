@@ -3,7 +3,7 @@ from werkzeug.urls import url_parse
 from flask_login import login_user, logout_user, current_user
 import datetime
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, DecimalField,IntegerField,SelectField
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, DecimalField,IntegerField,SelectField, DateField
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo,NumberRange
 
 from .models.user import User
@@ -11,6 +11,7 @@ from .models.purchase import Purchase
 from .models.product import Product
 from .models.inventory import Inventory
 from .models.feedback import ProductFeedback
+
 from flask import Blueprint
 bp = Blueprint('users', __name__)
 
@@ -114,12 +115,6 @@ def edit_info():
         address_temp = current_user.address
         email_temp = current_user.email
         if form.validate_on_submit():
-            if current_user.firstname != form.firstname.data:
-                firstname_temp = form.firstname.data
-            if current_user.lastname != form.lastname.data:
-                lastname_temp = form.lastname.data
-            if current_user.address != form.address.data:
-                address_temp = form.address.data
             if current_user.email != form.email.data:
                 if User.email_exists(form.email.data):
                     flash("email already exists")
@@ -131,6 +126,14 @@ def edit_info():
                 lastname = lastname_temp, email = email_temp, balance = balance, address = address_temp)
             flash("Something is wrong! Please try again!")
         else:
+            if not form.firstname.data:
+                form.firstname.data = current_user.firstname
+            if not form.lastname.data:
+                form.lastname.data = current_user.lastname
+            if not form.address.data:
+                form.address.data = current_user.address
+            if not form.email.data:
+                form.email.data = current_user.email
             return render_template('editinfo.html', accountnum = id, form = form)
     else:
         return redirect(url_for('users.login'))
@@ -211,9 +214,47 @@ class InventoryForm(FlaskForm):
     Price = DecimalField('Price', 
             validators=[DataRequired(), NumberRange(min=0, message='Can not enter negative number')])
     Quantity = IntegerField('Quantity', 
-                validators=[DataRequired(), NumberRange(min=0, message='Can not enter negative number')])
-    Delete =SelectField('Delete this Inventory', choices = ["No","Yes"], validators = [DataRequired()])
+                validators=[DataRequired(),NumberRange(min=0, message='Can not enter negative number')])
+    delete =SelectField('Delete this Inventory', choices = ["No","Yes"], validators = [DataRequired()])
     submit = SubmitField('Commit')
+
+class SearchForm(FlaskForm):
+    search_name = StringField('Product Name', validators=[DataRequired()])
+    sort_by = SelectField("Sort by", choices = ["Product Name","Date","Seller","Category"])
+    value_l = DecimalField('Value Lower Bound')
+    value_h = DecimalField('Value Upper Bound')
+    date_l = DateField('Date Earliest', format='%m/%d/%Y')
+    date_h = DateField('Date Latest', format='%m/%d/%Y')    
+    submit = SubmitField('Search')
+
+@bp.route("/history/search", methods=['GET','POST'])
+def search():
+    form = SearchForm()
+    if form.validate_on_submit():
+        if form.sort_by.data == "Product Name":
+            form.sort_by.data = 'Pro.name'
+        if form.sort_by.data == "Date":
+            form.sort_by.data = 'Pur.time_purchased'
+        if form.sort_by.data == "Seller":
+            form.sort_by.data = 'Pur.sid'
+        if form.sort_by.data == "Category":
+            form.sort_by.data = 'Pro.category'
+        if User.search_pur(current_user.id, form.search_name.data, form.sort_by.data, form.value_l.data, form.value_h.data, form.date_l.data, form.date_h.data ):
+            result = User.search_pur(current_user.id, form.search_name.data, form.sort_by.data, form.value_l.data, form.value_h.data, form.date_l.data, form.date_h.data )
+            return render_template('search_result.html', result = result)
+        else:
+            flash("Invalid search. Please try again.")
+            return render_template('search.html', form = form)
+    else:
+        if not form.value_l.data:
+            form.value_l.data = 0
+        if not form.value_h.data:
+            form.value_h.data = 9999999999999999
+        if not form.date_l.data:
+            form.date_l.data = datetime.datetime(1980, 9, 14, 0, 0, 0)
+        if not form.date_h.data:
+            form.date_h.data = datetime.datetime.now()
+        return render_template('search.html', form = form)
 
 @bp.route('/history/addinventory', methods=['GET','POST'])
 def addinventory():

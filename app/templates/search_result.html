@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h3></h3>
+<br><br>
+
+{% if current_user.is_authenticated %}
+<table class='table table-hover table-bordered container'>
+  <thead class="thead-dark">
+    <tr>
+      <th scope="col">Product Category</th>
+      <th scope="col">Product Name</th>
+      <th scope="col">Price</th>
+      <th scope="col">Quantity</th>
+      <th scope="col">Date</th>
+      <th scope="col">Seller</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for hist in result%}
+      <tr>
+        <th scope="row">{{hist.category}}</th>
+        <td>{{hist.name}}</td>
+        <td>{{hist.price}}</td>
+        <td>{{hist.quantity}}</td>
+	<td>{{hist.date_pur}}</td>
+        <td>{{hist.seller}}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{%else%}
+<p><a href="{{ url_for('users.login') }}">Log in</a> to see your purchase history!</p>
+{% endif %}
+<a class="btn btn-secondary" href="{{ url_for('users.search') }}" role="button">Return to search</a>
+<a class="btn btn-secondary" href="{{ url_for('users.history') }}" role="button">Return to history</a>
+{% endblock %}
