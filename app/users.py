@@ -200,8 +200,7 @@ def history():
                 current_user.id, datetime.datetime(1980, 9, 14, 0, 0, 0))
             
         else:
-            record = Purchase.get_all_by_uid_since(
-                current_user.id, datetime.datetime(1980, 9, 14, 0, 0, 0))
+            record = User.get_pur(current_user.id)
     else:
         record = None
     return render_template('history.html',

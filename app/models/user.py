@@ -153,3 +153,16 @@ ORDER BY {temp_2} DESC, order_id """
             return [row[0] for row in rows]
         else:
             return None
+
+    @staticmethod
+    def get_pur(id):
+        rows = app.db.execute(f"""
+SELECT Pro.name as name, Pro.category as category, Pur.price as price, Pur.quantity as quantity, Pur.time_purchased as date_pur
+FROM Purchases Pur
+JOIN Products Pro
+ON Pur.pid = Pro.id
+WHERE Pur.uid = :id
+ORDER BY Pur.time_purchased DESC"""
+,
+                              id = id)
+        return rows
