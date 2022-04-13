@@ -30,6 +30,7 @@
           <td>{{purchase.quantity}}</td>
           <td>{{purchase.prodname}}</td>
           <td>{{purchase.time_purchased}}</td>
+          {% if not purchase.batch_status%}
           <td> <a class="btn btn-secondary" 
             href="{{ url_for('users.manage_orders',oid = purchase.id) }}" 
             role="button">Manage Orders</a>
@@ -37,6 +38,14 @@
             href="{{ url_for('users.update_inventory',iid = purchase.id) }}" 
             role="button">View Order Detail</a>
           </td>
+          {% else %}
+          <td>
+          <a class="btn btn-secondary" 
+          href="{{ url_for('users.update_inventory',iid = purchase.id) }}" 
+          role="button">View Order Detail</a>
+          </td>
+          {% endif %}
+          
         </tr>
       {% endfor %}
     </tbody>

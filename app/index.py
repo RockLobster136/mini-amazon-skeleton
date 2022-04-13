@@ -4,6 +4,7 @@ import datetime
 
 from .models.product import Product
 from .models.purchase import Purchase
+from .models.feedback import ProductFeedback
 
 from flask import Blueprint
 bp = Blueprint('index', __name__)
@@ -12,6 +13,6 @@ bp = Blueprint('index', __name__)
 @bp.route('/')
 def index():
     # get all available products for sale:
-    products = Product.get_all(True)
+    products = ProductFeedback.summary_rating(True)
     return render_template('index.html',
                            avail_products=products)
