@@ -1,9 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h3>Your History:  <a class="btn btn-secondary" href="{{ url_for('users.search') }}" role="button">Advance Search</a></h3>
 
-<br><br>
 {% if current_user.is_authenticated and current_user.isSeller %}
 <h6>Your Inventory:</h6>
 
@@ -38,14 +36,11 @@
   </tbody>
 </table>
 
-{%else%}
-<p><a href="{{ url_for('users.login') }}">Log in</a> to see your purchase history!</p>
-
-{% endif %}
+{% elif current_user.is_authenticated and not current_user.isSeller %}
+<h6>Your Recent Purchases: <a class="btn btn-secondary" href="{{ url_for('users.search') }}" role="button">Advance Search</a></h6>
 
 <br><br>
-{% if current_user.is_authenticated %}
-<h6>Your Recent Purchases:</h6>
+
 <table class='table table-hover table-bordered container'>
   <thead class="thead-dark">
     <tr>
@@ -69,6 +64,7 @@
     {% endfor %}
   </tbody>
 </table>
+
 {%else%}
 <p><a href="{{ url_for('users.login') }}">Log in</a> to see your purchase history!</p>
 
