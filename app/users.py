@@ -218,7 +218,7 @@ class InventoryForm(FlaskForm):
     delete =SelectField('Delete this Inventory', choices = ["No","Yes"], validators = [DataRequired()])
     submit = SubmitField('Commit')
 
-class SearchForm(FlaskForm):
+class SearchForm_hist(FlaskForm):
     search_name = StringField('Product Name', validators=[DataRequired()])
     sort_by = SelectField("Sort by", choices = ["Product Name","Date","Seller","Category"])
     value_l = DecimalField('Value Lower Bound')
@@ -229,7 +229,7 @@ class SearchForm(FlaskForm):
 
 @bp.route("/history/search", methods=['GET','POST'])
 def search():
-    form = SearchForm()
+    form = SearchForm_hist()
     if form.validate_on_submit():
         if form.sort_by.data == "Product Name":
             form.sort_by.data = 'Pro.name'
@@ -329,7 +329,6 @@ def manage_orders(oid = None):
                     flash("Successfully delete")
             return render_template("manageorders.html",form = form)
     return render_template("manageorders.html",form = form)
-
 
 @bp.route('/orders/view/<oid>', methods=['GET','POST'])
 def view_order(oid = None):
