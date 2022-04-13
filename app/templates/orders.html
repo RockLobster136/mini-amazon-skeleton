@@ -5,6 +5,9 @@
 <br><br>
 {% if current_user.is_authenticated and current_user.isSeller %}
 <h3>Your Orders:</h3>
+<a class="btn btn-secondary" 
+            href="{{ url_for('users.login') }}" 
+            role="button">Filter&Search Orders</a>
 <table class='table table-hover table-bordered container'>
     <thead class="thead-dark">
       <tr>
@@ -35,13 +38,13 @@
             href="{{ url_for('users.manage_orders',oid = purchase.id) }}" 
             role="button">Manage Orders</a>
             <a class="btn btn-secondary" 
-            href="{{ url_for('users.update_inventory',iid = purchase.id) }}" 
+            href="{{ url_for('users.view_order',oid = purchase.id) }}" 
             role="button">View Order Detail</a>
           </td>
           {% else %}
           <td>
           <a class="btn btn-secondary" 
-          href="{{ url_for('users.update_inventory',iid = purchase.id) }}" 
+          href="{{ url_for('users.view_order',oid = purchase.id) }}" 
           role="button">View Order Detail</a>
           </td>
           {% endif %}

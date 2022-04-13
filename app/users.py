@@ -1,5 +1,6 @@
 from flask import render_template, redirect, url_for, flash, request
 from werkzeug.urls import url_parse
+import datetime
 from flask_login import login_user, logout_user, current_user
 import datetime
 from flask_wtf import FlaskForm
@@ -280,13 +281,35 @@ def manage_orders(oid = None):
     if form.validate_on_submit():
         if oid: 
             if form.fulfillOrder.data == "Yes":
-                if Purchase.fulfill_item(oid):
+                time = datetime.datetime.now()
+                if Purchase.fulfill_item(oid,time):
                     flash("Successfully Fulfill")
-
-
+            elif form.cancelOrder.data == "Yes":
+                if Purchase.delete_item(oid):
+                    flash("Successfully delete")
             return render_template("manageorders.html",form = form)
     return render_template("manageorders.html",form = form)
 
+
+@bp.route('/orders/view/<oid>', methods=['GET','POST'])
+def view_order(oid = None):
+    if oid:
+        print(oid)
+        order_detail = Purchase.get_seller_order_view(current_user.id,oid)
+        return render_template("view.html",order_detail = order_detail)
+    return render_template("view.html",order_detail = None)
+
+
+class SearchForm(FlaskForm):
+    fulfill_status = SelectField("Fulfillment Status", choice = ["Fulfilled", "Not Fulfilled"])
+    prodName = StringField("Product Name")
+    year_range = SelectField("Recent", choices = ["1 month","3 months", "1 years","All"])
+
+@bp.route('/orders/search', methods=['GET','POST'])
+def search_order():
+    form = SearchForm()
+    if form.year_range.data == "1 month":
+        date = datetime.datetime
 
 # Feedback
 
@@ -315,7 +338,6 @@ def add_feedback(isseller =None):
     if current_user.is_authenticated:
         form = FeedbackForm()
         if isseller == "Yes":
-            # 
             sids = SellerFeedback.non_reviewed_sellers(current_user.id)
             choices = [User.get_user_name(sid)[0] for sid in sids]
             form.sellerName.choices = choices

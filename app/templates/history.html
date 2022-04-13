@@ -48,18 +48,24 @@
     <tr>
       <th scope="col">Product Category</th>
       <th scope="col">Product Name</th>
-      <th scope="col">Seller</th>
+      <th scope="col">Quantity</th>
       <th scope="col">Price</th>
       <th scope="col">Quantity</th>
-      <th scope="col">Review</th>
+      <th scope="col">Fulfillment Status</th>
+      <th scope="col">Order Time</th>
     </tr>
   </thead>
   <tbody>
     {% for purchase in purchase_history%}
       <tr>
-        <th scope="row">{{purchase.id}}</th>
-        <td>{{purchase.pid}}</td>
+        <th scope="row">{{purchase.podcat}}</th>
+        <td>{{purchase.prodname}}</td>
+        <td>{{purchase.quantity}}</td>
+        <td>{{purchase.price}}</td>
         <td>{{purchase.time_purchased}}</td>
+        <td>{{purchase.order_status}}</td>
+        <td>{{purchase.time_purchased}}</td>
+        
       </tr>
     {% endfor %}
   </tbody>
