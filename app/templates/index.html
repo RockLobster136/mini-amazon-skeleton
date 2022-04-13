@@ -10,7 +10,6 @@
     <tr>
       <th scope="col">Product ID</th>
       <th scope="col">Product Name</th>
-      <th scope="col">Available</th>
       <th scope="col">Category</th>
       <th scope="col">Average Rating</th>
       <th scope="col">Count Rating</th>
@@ -21,7 +20,6 @@
       <tr>
         <th scope="row">{{product.id}}</th>
         <td>{{product.name}}</td>
-        <td>{{product.available}}</td>
         <td>{{product.category}}</td>
         {% if product.cnt_rating > 0 and product.avg_rating >= 0 %}
         <td>{{product.avg_rating}}</td>
