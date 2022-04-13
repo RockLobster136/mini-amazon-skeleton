@@ -1,4 +1,5 @@
 from flask import current_app as app
+from .product import Product
 
 # product feedback
 
@@ -94,6 +95,28 @@ class ProductFeedback:
             else:
                 return None
 
+    @staticmethod
+    def summary_rating(available = True):
+        rows = app.db.execute('''
+        SELECT Products.id,Products.name,Categories.name AS category,description,price,image,available,creator_id,        
+        CASE WHEN cnt_rating IS NULL THEN 0 ELSE cnt_rating END AS cnt_rating, avg_rating
+        FROM
+        Products 
+        Left JOIN
+        (
+            SELECT ROUND(AVG(rating),2) AS avg_rating, COUNT(rating) AS cnt_rating, pid
+            FROM ProductFeedback
+            GROUP BY pid
+        ) AS t1
+        ON Products.id = t1.pid
+        INNER JOIN Categories
+        ON Products.category = Categories.id
+        WHERE Products.available = :available
+        ORDER BY Products.name
+        ''', available = available)
+        print(rows[0])
+        return [Product(*row) for row in rows]
+
 
 # seller feedback
 
@@ -184,3 +207,4 @@ class SellerFeedback:
                 return rows[0][0]
             else:
                 return None
+

@@ -9,7 +9,7 @@
 {% elif current_user.is_authenticated %}
 <h6>Your Feedbacks:</h6>
 
-<a class="btn btn-secondary" href="{{ url_for('users.add_feedback', isseller='Yes') }}" role="button">Manage Your Seller Feedback</a>
+<a class="btn btn-secondary" href="{{ url_for('users.add_feedback', isseller='Yes') }}" role="button">Add Your Seller Feedback</a>
 <table class='table table-hover table-bordered container'>
     <thead class="thead-dark">
       <tr>
@@ -43,7 +43,7 @@
     </tbody>
 </table>
 
-<a class="btn btn-secondary" href="{{ url_for('users.add_feedback', isseller='No') }}" role="button">Manage Your Product Feedback</a>
+<a class="btn btn-secondary" href="{{ url_for('users.add_feedback', isseller='No') }}" role="button">Add Your Product Feedback</a>
 <table class='table table-hover table-bordered container'>
     <thead class="thead-dark">
       <tr>

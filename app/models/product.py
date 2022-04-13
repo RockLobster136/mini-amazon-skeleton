@@ -2,7 +2,7 @@ from flask import current_app as app
 
 
 class Product:
-    def __init__(self, id, name, category, description, price, image=None, available=None, creator_id=None):
+    def __init__(self, id, name, category, description, price, image=None, available=None, creator_id=None, cnt_rating = -1, avg_rating = -1):
         self.id = id
         self.name = name
         self.description = description
@@ -11,6 +11,8 @@ class Product:
         self.image = image
         self.available = available
         self.creator_id = creator_id
+        self.cnt_rating = cnt_rating
+        self.avg_rating = avg_rating
 
     # get single product by product id
     @staticmethod
