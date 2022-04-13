@@ -242,10 +242,9 @@ def search():
         if User.search_pur(current_user.id, form.search_name.data, form.sort_by.data, form.value_l.data, form.value_h.data, form.date_l.data, form.date_h.data ):
             result = User.search_pur(current_user.id, form.search_name.data, form.sort_by.data, form.value_l.data, form.value_h.data, form.date_l.data, form.date_h.data )
             return render_template('search_result.html', result = result)
-            flash("111")
         else:
-            flash("Invalid search. Please try again.")
             return render_template('search.html', form = form)
+            flash("Invalid search. Please try again.")
     else:
         if not form.value_l.data:
             form.value_l.data = 0
