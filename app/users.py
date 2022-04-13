@@ -10,7 +10,7 @@ from .models.user import User
 from .models.purchase import Purchase
 from .models.product import Product
 from .models.inventory import Inventory
-from .models.feedback import ProductFeedback
+from .models.feedback import ProductFeedback, SellerFeedback
 from flask import Blueprint
 bp = Blueprint('users', __name__)
 
@@ -273,8 +273,8 @@ class OrderForm(FlaskForm):
     cancelOrder = SelectField("Cancel this Order", choices = ["No","Yes"])
     fulfillOrder = SelectField("Fulfill this Order", choices = ["No","Yes"])
     submit = SubmitField('Commit')
-@bp.route('/orders/manage/<oid>', methods=['GET','POST'])
 
+@bp.route('/orders/manage/<oid>', methods=['GET','POST'])
 def manage_orders(oid = None):
     form = OrderForm()
     if form.validate_on_submit():
@@ -291,23 +291,69 @@ def manage_orders(oid = None):
 # Feedback
 
 class FeedbackForm(FlaskForm):
-    prodName = StringField('Product Name')
-    rating = IntegerField('Rating', 
-            validators=[DataRequired(), NumberRange(min=0, max=10, message='Input number between 0 and 10')])
+    prodName = SelectField('Product Name', choices = [])
+    sellerName = SelectField('Seller Name', choices = [])
+    rating = SelectField('Rating', choices = [i for i in range(0,11)])
     review = StringField('Review')
+    delete = SelectField('Delete this review?', choices = ['No','Yes'])
     submit = SubmitField('Commit')
 
 
 @bp.route('/feedback', methods=['GET','POST'])
 def feedback():
     # retrive buyer's feedbacks
-    feedbacks = ProductFeedback.get_all_feedbacks(current_user.id)
-    return render_template('feedback.html',feedbacks = feedbacks)
+    if current_user.is_authenticated:
+        product_feedbacks = ProductFeedback.get_all_feedbacks(current_user.id)
+        seller_feedbacks = SellerFeedback.get_all_feedbacks(current_user.id)
+        return render_template('feedback.html', product_feedbacks = product_feedbacks, seller_feedbacks = seller_feedbacks)
+    else:
+        return render_template('feedback.html', product_feedbacks = None, seller_feedbacks = None)
 
-@bp.route('/feedback/add_feedback', methods=['GET','POST'])
-def add_feedback():
+@bp.route('/feedback/add_feedback/<isseller>', methods=['GET','POST'])
+def add_feedback(isseller =None):
     # retrive buyer's feedbacks
     if current_user.is_authenticated:
         form = FeedbackForm()
-    return render_template('add_feedback.html', form=form)
+        if isseller == "Yes":
+            # 
+            sids = SellerFeedback.non_reviewed_sellers(current_user.id)
+            choices = [User.get_user_name(sid)[0] for sid in sids]
+            form.sellerName.choices = choices
+            print(choices)
+            if form.rating.data:
+                sid = sids[choices==form.sellerName.data]
+                if SellerFeedback.add_feedback(current_user.id, sid, form.rating.data, form.review.data):
+                    flash("Succesfully added review!")
+                    return render_template('add_feedback.html', form=form,isseller = isseller)
+        else:
+            choices = ProductFeedback.non_reviewed_products(current_user.id)
+            form.prodName.choices = choices
+            if form.rating.data:
+                pid = Product.prod_find(form.prodName.data)
+                if ProductFeedback.add_feedback(current_user.id, pid, form.rating.data, form.review.data):
+                    flash("Succesfully added review!")
+        return render_template('add_feedback.html', form=form,isseller = isseller)
+    else:
+        return render_template('add_feedback.html', form=None,isseller = None)
 
+@bp.route('/feedback/edit_feedback/<feedback_id>-<isseller>', methods=['GET','POST'])
+def edit_feedback(feedback_id = None, isseller = None):
+    if feedback_id:
+        form = FeedbackForm()
+        if form.rating.data or form.review.data or form.delete.data:
+            if isseller == "No":
+                if ProductFeedback.update_product_review(feedback_id, form.rating.data, form.review.data, form.delete.data == 'Yes'):
+                    if form.delete.data == "Yes":
+                        flash("Successfully deleted review")
+                    else:
+                        flash("Successfully edited review")
+                    return render_template('edit_feedback.html', form = form)
+            else:
+                if SellerFeedback.update_seller_review(feedback_id, form.rating.data, form.review.data, form.delete.data == 'Yes'):
+                    if form.delete.data == "Yes":
+                        flash("Successfully deleted review")
+                    else:
+                        flash("Successfully edited review")
+                    return render_template('edit_feedback.html', form = form)
+        return render_template('edit_feedback.html', form = form)
+    
