@@ -21,8 +21,16 @@
   <tbody>
     {% for res in result%}
       <tr>
-        <th scope="row">{{res.id}}</th>
-        <td>{{res.category}}</td>
+	<th scope="row">{{res.id}}</th>
+        {% if res.category == 1 %}
+          <td>Purchase</td>
+        {% elif res.category == 2 %}
+          <td>Sell</td>
+        {% elif res.category == 3 %}
+          <td>Deposite</td>
+        {% else %}
+          <td>Withdraw</td>
+        {% endif %}
         <td>{{res.start}}</td>
         <td>{{res.amount}}</td>
         <td>{{res.end}}</td>
