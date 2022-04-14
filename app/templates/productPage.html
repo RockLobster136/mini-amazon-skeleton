@@ -1,5 +1,5 @@
 {% extends "base.html" %} {% block content %} {% if user_creator %}
-<a href="{{url_for('index.updateProduct',pid=product.pid)}}">
+<a href="{{url_for('index.updateProduct',pid=product.id)}}">
 <button class="btn btn-light update_product_button">
   Update Product </a>
 </button>
