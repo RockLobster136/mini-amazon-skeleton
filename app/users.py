@@ -202,6 +202,8 @@ def history():
         else:
             record = Purchase.get_all_by_uid_since(
                 current_user.id, datetime.datetime(1980, 9, 14, 0, 0, 0))
+            print(record[0].prodname)
+            print(record[0].podcat)
     else:
         record = None
     return render_template('history.html',
@@ -241,11 +243,11 @@ def search():
             form.sort_by.data = 'Pro.category'
         if User.search_pur(current_user.id, form.search_name.data, form.sort_by.data, form.value_l.data, form.value_h.data, form.date_l.data, form.date_h.data ):
             result = User.search_pur(current_user.id, form.search_name.data, form.sort_by.data, form.value_l.data, form.value_h.data, form.date_l.data, form.date_h.data )
-            return render_template('search_result.html', result = result)
+            return render_template('search_result.html', result = result,order_search = False)
             flash("111")
         else:
             flash("Invalid search. Please try again.")
-            return render_template('search.html', form = form)
+            return render_template('search.html', form = form,order_search = False)
     else:
         if not form.value_l.data:
             form.value_l.data = 0
@@ -255,7 +257,7 @@ def search():
             form.date_l.data = datetime.datetime(1980, 9, 14, 0, 0, 0)
         if not form.date_h.data:
             form.date_h.data = datetime.datetime.now()
-        return render_template('search.html', form = form)
+        return render_template('search.html', form = form,order_search = False)
 
 @bp.route('/history/addinventory', methods=['GET','POST'])
 def addinventory():
@@ -294,7 +296,7 @@ def update_inventory(iid = None):
     return render_template("update.html",form = form)
 
 
-@bp.route('/orders', methods=['GET','POST'])
+@bp.route('/info/orders', methods=['GET','POST'])
 def orders():
     if current_user.is_authenticated:
         if current_user.isSeller:
@@ -335,9 +337,10 @@ def manage_orders(oid = None):
 def view_order(oid = None):
     if oid:
         print(oid)
-        order_detail = Purchase.get_seller_order_view(current_user.id,oid)
-        return render_template("view.html",order_detail = order_detail)
-    return render_template("view.html",order_detail = None)
+        order_detail = Purchase.get_seller_order_view(oid)
+        seller_info = Purchase.get_seller_info(oid)
+        return render_template("view.html",order_detail = order_detail,seller_info = seller_info)
+    return render_template("view.html",order_detail = None,seller_info =None)
 
 
 class SearchForm(FlaskForm):
@@ -350,6 +353,47 @@ def search_order():
     form = SearchForm()
     if form.year_range.data == "1 month":
         date = datetime.datetime
+
+
+
+class SearchForm_order(FlaskForm):
+    search_name = StringField('Product Name', validators=[DataRequired()])
+    sort_by = SelectField("Show", choices = ["All Orders","Unfilfilled Orders","Fulfilled Orders"])
+    value_l = DecimalField('Value Lower Bound')
+    value_h = DecimalField('Value Upper Bound')
+    date_l = DateField('Date Earliest', format='%m/%d/%Y')
+    date_h = DateField('Date Latest', format='%m/%d/%Y')    
+    submit = SubmitField('Search')
+
+@bp.route("/orders/order_search", methods=['GET','POST'])
+def order_search():
+    form = SearchForm_order()
+    if form.validate_on_submit():
+        if Purchase.search_order(current_user.id, form.search_name.data, form.sort_by.data, form.value_l.data, form.value_h.data, form.date_l.data, form.date_h.data ):
+            result = Purchase.search_order(current_user.id, form.search_name.data, form.sort_by.data, form.value_l.data, form.value_h.data, form.date_l.data, form.date_h.data )
+            return render_template('search_result.html', result = result,order_search = True)
+        else:
+            flash("Invalid search. Please try again.")
+            
+            return render_template('search.html', form = form,order_search = True)
+    else:
+        if not form.value_l.data:
+            form.value_l.data = 0
+        if not form.value_h.data:
+            form.value_h.data = 9999999999999999
+        if not form.date_l.data:
+            form.date_l.data = datetime.datetime(1980, 9, 14, 0, 0, 0)
+        if not form.date_h.data:
+            form.date_h.data = datetime.datetime.now()
+        return render_template('search.html', form = form,order_search = True)
+
+
+
+
+
+
+
+
 
 # Feedback
 

@@ -59,7 +59,9 @@
     {% if not current_user.isSeller %}
 	  <a href="{{ url_for('users.feedback') }}" type="button" class="btn btn-light">My Feedback</a>
     {% endif %}
+    {% if current_user.isSeller %}
     <a href="{{ url_for('users.orders') }}" type="button" class="btn btn-light">My Orders</a>
+    {% endif %}
 	  <a href="{{ url_for('users.logout') }}" type="button" class="btn btn-light">Log out</a>
         {% else %}
           <a href="{{ url_for('users.login') }}" type="button" class="btn btn-light">Log in</a>

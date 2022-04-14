@@ -68,7 +68,7 @@ FROM Purchases Pur
 INNER JOIN Products Pro
 ON Pur.pid = Pro.id
 INNER JOIN Users U
-ON Pur.uid = U.id
+ON Pur.sid = U.id
 WHERE sid = :sid
 AND time_purchased >= :since
 ORDER BY time_purchased DESC ,order_id
@@ -121,7 +121,7 @@ WHERE order_id = :oid AND sid = :sid
     
     
     @staticmethod
-    def get_seller_order_view(sid,oid):
+    def get_seller_order_view(oid):
         rows = app.db.execute('''
 SELECT Pur.id, Pur.uid, Pur.pid, Pur.sid, Pur.time_purchased, Pur.quantity,
 Pur.price,order_id,order_status,fulfill_date,Pro.name,Categories.name,Pro.description,
@@ -133,14 +133,14 @@ INNER JOIN Users U
 ON Pur.uid = U.id
 INNER JOIN Categories
 ON Categories.id = Pro.category
-WHERE sid = :sid
-AND Pur.id = :oid
+WHERE Pur.id = :oid
 ORDER BY time_purchased DESC ,order_id
 ''',
-                              sid=sid,
+                              
                               oid=oid)
 
         return [Purchase(*row) for row in rows]
+    @staticmethod
     def filter_by_conditions(sid,oid,year,status = True):
         rows = app.db.execute('''
 SELECT Pur.id, Pur.uid, Pur.pid, Pur.sid, Pur.time_purchased, Pur.quantity,
@@ -161,3 +161,58 @@ ORDER BY time_purchased DESC ,order_id
                               oid=oid,
                               status = status,
                               year = year)
+
+
+
+    @staticmethod
+    def get_seller_info(id):
+        rows = app.db.execute(''' 
+        SELECT U.firstname,U.lastname
+        FROM Purchases P
+        INNER JOIN Users U
+        ON P.sid = U.id
+        WHERE P.id = :id
+        ''', id = id)
+        if rows:
+            if len(rows[0])>1:
+                fullname = rows[0][0] + " " + rows[0][1]
+                return fullname
+            else:
+                return None
+        else:
+            return None
+
+    def search_order(sid,text,condition, val_l, val_h, d_l, d_h):
+        text = f"""'%{text}%'"""
+        query = f"""
+       SELECT Pur.id, Pur.uid, Pur.pid, Pur.sid, Pur.time_purchased, Pur.quantity,
+        Pur.price,order_id,order_status,fulfill_date,Pro.name,Pro.category,Pro.description,
+        Pro.image,U.address
+        FROM Purchases Pur
+        INNER JOIN Products Pro
+        ON Pur.pid = Pro.id
+        INNER JOIN Users U
+        ON Pur.sid = U.id
+        WHERE sid = :sid
+        AND Pur.price >= :val_l AND Pur.price <= :val_h
+        AND time_purchased >= :d_l AND time_purchased <= :d_h
+        AND Pro.name LIKE {text}"""
+        #query += text
+        if condition =="All Orders":
+            condition_text = ""
+        elif condition == "Unfilfilled Orders":
+            condition_text = " AND Pur.order_status = FALSE"
+        else:
+            condition_text = " AND Pur.order_status = FALSE"
+        print(condition_text)
+        query += condition_text 
+        query += """
+        ORDER BY time_purchased DESC ,order_id
+        """
+        #print(query)
+        rows =  rows = app.db.execute(query,sid = sid, 
+                                        val_l = val_l,
+                                        val_h = val_h,
+                                        d_l = d_l,
+                                        d_h = d_h)
+        return [Purchase(*row) for row in rows]

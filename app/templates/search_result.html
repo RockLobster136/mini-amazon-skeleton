@@ -5,7 +5,7 @@
 <h3></h3>
 <br><br>
 
-{% if current_user.is_authenticated %}
+{% if current_user.is_authenticated and not order_search %}
 <table class='table table-hover table-bordered container'>
   <thead class="thead-dark">
     <tr>
@@ -21,7 +21,7 @@
     {% for hist in result%}
       <tr>
         <th scope="row">{{hist.category}}</th>
-        <td>{{hist.name}}</td>
+        <td>{{hist.pro}}</td>
         <td>{{hist.price}}</td>
         <td>{{hist.quantity}}</td>
 	<td>{{hist.date_pur}}</td>
@@ -30,9 +30,43 @@
     {% endfor %}
   </tbody>
 </table>
+<a class="btn btn-secondary" href="{{ url_for('users.search') }}" role="button">Return to search</a>
+<a class="btn btn-secondary" href="{{ url_for('users.history') }}" role="button">Return to history</a>
+{%elif current_user.is_authenticated and order_search %}
+<table class='table table-hover table-bordered container'>
+  <thead class="thead-dark">
+    <tr>
+      <th scope="col">Product Name</th>
+      <th scope="col">Category</th>
+      <th scope="col">Price</th>
+      <th scope="col">Quantity</th>
+      <th scope="col">Total Price</th>
+      <th scope="col">Shipping Address</th>
+      <th scope="col">Order Fulfillment Status</th>
+      <th scope="col">Order Fulfillment Time</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for order_detail in result%}
+      <tr>
+        <th scope="row">{{order_detail.prodname}}</th>
+        <td>{{order_detail.podcat}}</td>
+        <td>{{order_detail.price}}</td>
+        <td>{{order_detail.quantity}}</td>
+        <td>{{order_detail.total}}</td>
+        <td>{{order_detail.address}}</td>
+        <td>{{order_detail.order_status}}</td>
+        <td>{{order_detail.fulfill_date}}</td>
+      </tr>
+    {% endfor %}
+    <a class="btn btn-secondary" href="{{ url_for('users.order_search') }}" role="button">Return to search</a>
+<a class="btn btn-secondary" href="{{ url_for('users.orders') }}" role="button">Return to history</a>
+  </tbody>
+</table>
+
+
 {%else%}
 <p><a href="{{ url_for('users.login') }}">Log in</a> to see your purchase history!</p>
 {% endif %}
-<a class="btn btn-secondary" href="{{ url_for('users.search') }}" role="button">Return to search</a>
-<a class="btn btn-secondary" href="{{ url_for('users.history') }}" role="button">Return to history</a>
+
 {% endblock %}

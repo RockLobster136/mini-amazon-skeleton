@@ -6,7 +6,7 @@
 {% if current_user.is_authenticated and current_user.isSeller %}
 <h3>Your Orders:</h3>
 <a class="btn btn-secondary" 
-            href="{{ url_for('users.login') }}" 
+            href="{{ url_for('users.order_search') }}" 
             role="button">Filter&Search Orders</a>
 <table class='table table-hover table-bordered container'>
     <thead class="thead-dark">

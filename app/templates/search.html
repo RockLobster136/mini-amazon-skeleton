@@ -33,8 +33,22 @@
     {{ form.date_h.label }}
     {{ form.date_h(size=32) }}<br/>
   </p>
+  <p>
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <ul>
+      {% for message in messages %}
+      <li>{{ message }}</li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+    {% endwith %}
+  </p>
   <p>{{ form.submit() }}</p>
 </form>
-
+{% if not order_search%}
 <a class="btn btn-secondary" href="{{ url_for('users.history') }}" role="button">Cancel</a>
+{% else%}
+<a class="btn btn-secondary" href="{{ url_for('users.orders') }}" role="button">Cancel</a>
+{% endif %}
 {% endblock %}

@@ -3,7 +3,7 @@
 {% block content %}
 
 {% if current_user.is_authenticated and current_user.isSeller %}
-<h6>Your Inventory:</h6>
+<h3>Your Inventory:</h3>
 
 <a class="btn btn-secondary" href="{{ url_for('users.addinventory') }}" role="button">Add Inventory</a>
 <a class="btn btn-secondary" href="{{ url_for('users.addinventory') }}" role="button">Inventory Insights</a>
@@ -49,17 +49,21 @@
       <th scope="col">Quantity</th>
       <th scope="col">Price</th>
       <th scope="col">Date</th>
+      <th scope="col">Order Detail</th>
       <th scope="col">Review</th>
     </tr>
   </thead>
   <tbody>
     {% for purchase in purchase_history%}
       <tr>
-      	<th scope="row">{{purchase.category}}</th>
-        <td>{{purchase.name}}</td>
+      	<th scope="row">{{purchase.podcat}}</th>
+        <td>{{purchase.prodname}}</td>
         <td>{{purchase.price}}</td>
         <td>{{purchase.quantity}}</td>
-        <td>{{purchase.release_date}}</td>
+        <td>{{purchase.time_purchased}}</td>
+        <td><a class="btn btn-secondary" 
+            href="{{ url_for('users.view_order',oid = purchase.id) }}" 
+            role="button">View Order Detail</a></td>
       </tr>
     {% endfor %}
   </tbody>
