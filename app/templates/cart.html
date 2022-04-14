@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+    <br><br>
+
+    <h2>Cart</h2>
+    {% if current_user.is_authenticated %}
+        {% if is_checked_out_just_now %}
+            <br>
+            <h2>Thank you for your order, {{ current_user.firstname }}. </h2>
+            <p>Your order has been placed. </p>
+            <br>
+        {% endif %}
+        {% if checkout_error %}
+            <br>
+            <h2>Unable to check out. </h2>
+            <br>
+        {% endif %}
+        <h2>Your cart:</h2>
+
+        {% if cart|length > 0 %}
+            <table class='table table-hover table-bordered container'>
+                <thead class="thead-dark">
+                <tr>
+                    <th scope="col">Product name</th>
+                    <th scope="col">Seller</th>
+                    <th scope="col">Price</th>
+                    <th scope="col">Quantity</th>
+                    <th scope="col">Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for i in cart %}
+                    <tr>
+                        <th scope="row">{{ i.product_name }}</th>
+                        <td>{{ i.seller_name }}</td>
+                        <td>{{ i.product_price }}</td>
+                        <td>
+                             <form action="{{ url_for('cart.cart') }}" method="post">
+                                <input type="hidden" name="action" value="change_quantity"/>
+                                <input type="hidden" name="inventory_id" value="{{ i.inventory_id }}"/>
+                                 <label>
+                                     <input type="number" name="quantity" value="{{ i.quantity }}">
+                                 </label>
+                                 <input type="submit" value="Update">
+                            </form>
+                        </td>
+                        <td>
+                            <form action="{{ url_for('cart.cart') }}" method="post">
+                                <input type="hidden" name="action" value="remove"/>
+                                <input type="hidden" name="inventory_id" value="{{ i.inventory_id }}"/>
+                                <input type="submit" value="Remove from Cart">
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            <h4>Total price: {{ total_price }}</h4>
+            <form action="{{ url_for('cart.cart') }}" method="post">
+                <input type="hidden" name="action" value="checkout"/>
+                <input type="submit" value="Checkout" class="btn btn-dark">
+            </form>
+        {% else %}
+            <p>No item found in your cart.</p>
+        {% endif %}
+
+    {% else %}
+        <h3>You must <a href="{{ url_for('users.login') }}">Log in</a> to see your cart</h3>
+    {% endif %}
+
+{% endblock %}
