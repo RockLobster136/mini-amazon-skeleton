@@ -364,11 +364,10 @@ def manage_orders(oid = None):
 @bp.route('/orders/view/<oid>', methods=['GET','POST'])
 def view_order(oid = None):
     if oid:
-        print(oid)
         order_detail = Purchase.get_seller_order_view(oid)
         seller_info = Purchase.get_seller_info(oid)
-        return render_template("view.html",order_detail = order_detail,seller_info = seller_info)
-    return render_template("view.html",order_detail = None,seller_info =None)
+        return render_template("view.html", order_detail = order_detail, seller_info = seller_info)
+    return render_template("view.html", order_detail = None, seller_info = None)
 
 
 class SearchForm(FlaskForm):

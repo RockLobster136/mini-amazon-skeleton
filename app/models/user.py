@@ -157,7 +157,7 @@ ORDER BY {temp_2} DESC, order_id """
     @staticmethod
     def get_pur(id):
         rows = app.db.execute(f"""
-SELECT Pro.name as name, Pro.category as category, Pur.price*Pur.quantity as amount, Pur.time_purchased as date_pur, Pur.order_status as order_status
+SELECT Pur.id as id, Pro.name as name, Pro.category as category, Pur.price*Pur.quantity as amount, Pur.time_purchased as date_pur, Pur.order_status as order_status
 FROM Purchases Pur
 JOIN Products Pro
 ON Pur.pid = Pro.id
