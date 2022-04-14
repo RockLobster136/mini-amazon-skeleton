@@ -112,5 +112,6 @@ CREATE TABLE BalanceHistory(
     amount DECIMAL(12,2) NOT NULL, -- balance delta
     pid INT, -- purchase id (copied)
     uid INT NOT NULL REFERENCES Users(id), -- user id
-    category INT NOT NULL -- 1: buy, 2: sell, 3: deposite, 4: withdraw
+    category INT NOT NULL, -- 1: buy, 2: sell, 3: deposite, 4: withdraw
+    time_changed timestamp without time zone NOT NULL DEFAULT (current_timestamp AT TIME ZONE 'UTC')
 );
