@@ -181,7 +181,7 @@ ORDER BY time_purchased DESC ,order_id
                 return None
         else:
             return None
-
+    @staticmethod
     def search_order(sid,text,condition, val_l, val_h, d_l, d_h):
         text = f"""'%{text}%'"""
         query = f"""
@@ -216,3 +216,26 @@ ORDER BY time_purchased DESC ,order_id
                                         d_l = d_l,
                                         d_h = d_h)
         return [Purchase(*row) for row in rows]
+    
+    @staticmethod
+    def prod_trend(sid,prodname):
+        rows = app.db.execute('''
+SELECT Pur.id, Pur.uid, Pur.pid, Pur.sid, Pur.time_purchased, Pur.quantity,
+Pur.price,order_id,order_status,fulfill_date,Pro.name,Pro.category,Pro.description,
+Pro.image,U.address
+FROM Purchases Pur
+INNER JOIN Products Pro
+ON Pur.pid = Pro.id
+INNER JOIN Users U
+ON Pur.sid = U.id
+WHERE sid = :sid AND Pro.name = :prodname
+ORDER BY time_purchased DESC ,order_id
+''',
+                              sid=sid,
+                              prodname = prodname
+                              )
+        return [Purchase(*row) for row in rows]
+    
+
+
+    

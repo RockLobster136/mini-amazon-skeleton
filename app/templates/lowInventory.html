@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h5>Search Settings</h5>
+
+<form action="" method="post" novalidate>
+  {{ form.hidden_tag() }}
+  <p>
+    {{ form.number_threshold.label }}<br/>
+    {{ form.number_threshold(size=1) }}<br/>
+    {{ form.quantity_threshold.label }}<br/>
+    {{ form.quantity_threshold(size=1) }}<br/>
+  </p>
+  <p>
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <ul>
+      {% for message in messages %}
+      <li>{{ message }}</li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+    {% endwith %}
+  </p>
+  <p>{{ form.submit() }}</p>
+</form>
+<a class="btn btn-secondary" href="{{ url_for('users.seller_insight') }}" role="button">return</a>
+{% endblock %}

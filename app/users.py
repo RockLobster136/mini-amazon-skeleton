@@ -1,3 +1,4 @@
+
 from flask import render_template, redirect, url_for, flash, request
 from werkzeug.urls import url_parse
 import datetime
@@ -6,7 +7,6 @@ import datetime
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, DecimalField,IntegerField,SelectField, DateField
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo,NumberRange
-
 from .models.user import User
 from .models.purchase import Purchase
 from .models.product import Product
@@ -388,8 +388,46 @@ def order_search():
         return render_template('search.html', form = form,order_search = True)
 
 
+class low_form(FlaskForm):
+    number_threshold = SelectField("Number of Products displayed", choices = [1,3,5,10],validators=[DataRequired()])
+    quantity_threshold = SelectField('Product Less Than', choices = [1,5,10,20,100],validators=[DataRequired()])
+    submit = SubmitField('commit')
+class prod(FlaskForm):
+    prdoname = SelectField("Select Product", choices = [],validators=[DataRequired()])
+    submit = SubmitField('Select')
 
+@bp.route("/insights", methods=['GET','POST'])
+def seller_insight():
+    form = prod()
+    prods = Purchase.get_seller_orders(
+                current_user.id, datetime.datetime(1980, 9, 14, 0, 0, 0))
+    prodnames = [p.prodname for p in prods]
+    form.prdoname.choices = prodnames
+    if form.validate_on_submit():
+        name = form.prdoname.data.replace(" ", "-")
+        return render_template('insights.html',form = form,name = name)
+    return render_template('insights.html',form = form)
 
+@bp.route("/insights/<prodname>", methods=['GET','POST'])
+def prod_viz(prodname = None):
+    sid = current_user.id  
+    if prodname:
+        prodname = prodname.replace("-"," ")
+        prod_data = Purchase.prod_trend(sid,prodname)
+        return render_template("viz.html",prod_data = prod_data)
+    
+
+@bp.route("/insights/low-inventory", methods=['GET','POST'])
+def low_inventory():
+    form = low_form()
+    if form.validate_on_submit():
+        if Inventory.get_least_n(current_user.id,form.number_threshold.data,form.quantity_threshold.data):
+            record = Inventory.get_least_n(current_user.id,form.number_threshold.data,form.quantity_threshold.data)
+            return render_template("lowInventory_result.html",record = record)
+        else:
+            flash("No Result")
+    return render_template("lowInventory.html",form = form)
+    
 
 
 
@@ -462,4 +500,5 @@ def edit_feedback(feedback_id = None, isseller = None):
                         flash("Successfully edited review")
                     return render_template('edit_feedback.html', form = form)
         return render_template('edit_feedback.html', form = form)
-    
+
+

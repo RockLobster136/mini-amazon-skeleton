@@ -47,7 +47,7 @@ RETURNING id
         except Exception as e:
             print(str(e))
             return None
-    
+    @staticmethod
     def get_all_by_uid_since(sid, since):
         rows = app.db.execute('''
 SELECT I.id, I.sid, I.pid ,C.name,P.name ,I.quantity, I.price,I.release_date
@@ -59,7 +59,7 @@ ORDER BY release_date DESC
                               sid=sid,
                               since=since)
         return [Inventory(*row) for row in rows]
-    
+    @staticmethod
     def update_inventory(id,price,quantity):
         rows = app.db.execute("""
 UPDATE Inventory
@@ -74,6 +74,7 @@ RETURNING id
             return Inventory.get(rows[0][0])
         else:
             return None
+    @staticmethod
     def delete_inventory(id):
         rows = app.db.execute("""
 DELETE FROM Inventory
@@ -86,5 +87,19 @@ RETURNING id
             return rows[0][0]
         else:
             return None
+    @staticmethod
+    def get_least_n(sid,n,quantity):
+            rows = app.db.execute('''
+    SELECT I.id, I.sid, I.pid ,C.name,P.name ,I.quantity, I.price,I.release_date
+    FROM Inventory I, Products P, Categories C
+    WHERE I.pid = P.id AND I.sid = :sid AND P.category = C.id AND I.quantity < :quantity
+    ORDER BY I.quantity
+    LIMIT :n
+    ''',
+                                sid=sid,
+                                n=n,
+                                quantity = quantity)
+            return [Inventory(*row) for row in rows]
+
         
        

@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block content %}
+<h5>Manage Inventory</h5>
+<table class='table table-hover table-bordered container'>
+    <thead class="thead-dark">
+      <tr>
+        <th scope="col">Product Name</th>
+        <th scope="col">Quantity Ordered</th>
+        <th scope="col">Date</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for prod in prod_data%}
+        <tr>
+            <th scope="row">{{prod.prodname}}</th>
+            <th scope="row">{{prod.quantity}}</th>
+            <th scope="row">{{prod.time_purchased}}</th>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <a class="btn btn-secondary" href="{{ url_for('users.seller_insight') }}" role="button">Return to Analytics</a>
+  {% endblock %}

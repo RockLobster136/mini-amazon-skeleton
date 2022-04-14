@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h1>Your Inventory and Order Analytics:</h1>
+<br>
+<h3> Search Low Inventory </h3>
+<a class="btn btn-secondary" href="{{ url_for('users.low_inventory') }}" role="button">Search</a>
+<h3>Order Popularity Trend </h3>
+<form action="" method="post" novalidate>
+    {{ form.hidden_tag() }}
+    <p>
+      {{ form.prdoname.label }}<br/>
+      {{ form.prdoname(size=1) }}<br/>
+      <p>{{ form.submit() }}</p>
+    </p>
+    <p>
+      {% with messages = get_flashed_messages() %}
+      {% if messages %}
+      <ul>
+        {% for message in messages %}
+        <li>{{ message }}</li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+      {% endwith %}
+    </p>
+    <a class="btn btn-secondary" href="{{ url_for('users.prod_viz',prodname = name) }}" role="button">Go</a>
+  </form>
+
+{% endblock %}
