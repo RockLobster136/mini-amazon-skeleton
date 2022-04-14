@@ -256,6 +256,29 @@ def search():
             form.date_h.data = datetime.datetime.now()
         return render_template('search.html', form = form,order_search = False)
 
+class SearchForm_user(FlaskForm):
+    search_firstname = StringField('User First Name')
+    search_lastname = StringField('User Last Name')
+    search_role = SelectField('User Role', choices = ["Buyer","Seller","All"])
+    submit = SubmitField('Search')
+
+@bp.route("/finduser", methods=['GET','POST'])
+def search_user():
+    form = SearchForm_user()
+    if form.validate_on_submit():
+        if User.search_user(form.search_firstname.data.lower(), form.search_lastname.data.lower(), form.search_role.data):
+            result = User.search_user(form.search_firstname.data.lower(), form.search_lastname.data.lower(), form.search_role.data)
+            return render_template('find_user_result.html', result = result)
+        else:
+            flash("Invalid search. Please try again.")
+            return render_template('find_user.html', form = form)
+    else:
+        if not form.search_firstname.data:
+            form.search_firstname.data = "optional"
+        if not form.search_lastname.data:
+            form.search_lastname.data = "optional"
+        return render_template('find_user.html', form = form)
+
 @bp.route('/history/addinventory', methods=['GET','POST'])
 def addinventory():
     if current_user.is_authenticated and current_user.isSeller:

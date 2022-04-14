@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h3>Search For A User</h3>
+
+<form action="" method="post">
+  {{ form.hidden_tag() }}
+  <p>
+    {{ form.search_firstname.label }}<br/>
+    {{ form.search_firstname(size=32) }}<br/>
+    
+    {{ form.search_lastname.label }}<br/>
+    {{ form.search_lastname(size=32) }}<br/>
+    
+    {{ form.search_role.label }}<br/>
+    {{ form.search_role(size=2) }}<br/>
+    
+    {% for error in form.search_firstname.errors %}
+    <span style="color: red;">[{{ error }}]</span>
+    {% endfor %}
+    {% for error in form.search_lastname.errors %}
+    <span style="color: red;">[{{ error }}]</span>
+    {% endfor %}
+    {% for error in form.search_role.errors %}
+    <span style="color: red;">[{{ error }}]</span>
+    {% endfor %}
+  </p>
+  <p>
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <ul>
+      {% for message in messages %}
+      <li>{{ message }}</li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+    {% endwith %}
+  </p>
+  <p>{{ form.submit() }}</p>
+</form>
+<a class="btn btn-secondary" href="{{ url_for('index.index') }}" role="button">Cancel</a>
+
+{% endblock %}

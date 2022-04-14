@@ -166,3 +166,44 @@ ORDER BY Pur.time_purchased DESC"""
 ,
                               id = id)
         return rows
+
+    @staticmethod
+    def search_user(firstname, lastname, role):
+        r = 100
+        if role == "Buyer":
+            r = 0
+        if role == "Seller":
+            r = 1
+        if r != 100:
+            switch = f""" """
+        else:
+            switch = f"""--"""
+        if firstname != "optional" or lastname != "optional":
+            if firstname == "optional" and lastname != "optional":
+                lower = lastname.lower()
+                name_field = f"""lastname"""
+            if firstname != "optional" and lastname == "optional":
+                lower = firstname.lower()
+                name_field = f"""firstname"""
+            temp = f"""'%{lower}%'"""
+            rows = app.db.execute(f"""
+SELECT id, firstname, lastname, isSeller
+FROM Users
+WHERE LOWER({name_field}) LIKE {temp}
+{switch} AND isSeller = {r}
+ORDER BY id""")
+            return rows
+        if firstname != "optional" and lastname != "optional":
+            lower = firstname.lower()
+            temp = f"""'%{lower}%'"""
+            lower_2 = lastname.lower()
+            temp_2 = f"""'%{lower_2}%'"""
+            rows = app.db.execute(f"""
+SELECT id, firstname, lastname, isSeller
+FROM Users
+WHERE LOWER(firstname) LIKE {temp}
+AND LOWER(lastname) LIKE {temp_2}
+{switch} AND isSeller = {r}
+ORDER BY id""")
+            return rows
+        return None
