@@ -49,18 +49,18 @@
       <th scope="col">Product Name</th>
       <th scope="col">Amount</th>
       <th scope="col">Date</th>
+      <th scope="col">Order Status</th>
       <th scope="col">Order Detail</th>
-      <th scope="col">Review</th>
     </tr>
   </thead>
   <tbody>
     {% for purchase in purchase_history%}
       <tr>
-      	<th scope="row">{{purchase.podcat}}</th>
-        <td>{{purchase.prodname}}</td>
-        <td>{{purchase.price}}</td>
-        <td>{{purchase.quantity}}</td>
-        <td>{{purchase.time_purchased}}</td>
+      	<th scope="row">{{purchase.category}}</th>
+        <td>{{purchase.name}}</td>
+        <td>{{purchase.amount}}</td>
+        <td>{{purchase.date_pur}}</td>
+	<td>{{purchase.order_status}}</td>
         <td><a class="btn btn-secondary" 
             href="{{ url_for('users.view_order',oid = purchase.id) }}" 
             role="button">View Order Detail</a></td>
