@@ -171,9 +171,9 @@ ORDER BY Pur.time_purchased DESC"""
     def search_user(firstname, lastname, role):
         r = 100
         if role == "Buyer":
-            r = 0
+            r = False
         if role == "Seller":
-            r = 1
+            r = True
         if r != 100:
             switch = f""" """
         else:
@@ -187,7 +187,7 @@ ORDER BY Pur.time_purchased DESC"""
                 name_field = f"""firstname"""
             temp = f"""'%{lower}%'"""
             rows = app.db.execute(f"""
-SELECT id, firstname, lastname, isSeller
+SELECT id, firstname, lastname, isseller
 FROM Users
 WHERE LOWER({name_field}) LIKE {temp}
 {switch} AND isSeller = {r}
@@ -199,7 +199,7 @@ ORDER BY id""")
             lower_2 = lastname.lower()
             temp_2 = f"""'%{lower_2}%'"""
             rows = app.db.execute(f"""
-SELECT id, firstname, lastname, isSeller
+SELECT id, firstname, lastname, isseller
 FROM Users
 WHERE LOWER(firstname) LIKE {temp}
 AND LOWER(lastname) LIKE {temp_2}
@@ -207,3 +207,21 @@ AND LOWER(lastname) LIKE {temp_2}
 ORDER BY id""")
             return rows
         return None
+
+    @staticmethod
+    def get_seller(id):
+        rows = app.db.execute('''
+        SELECT id, firstname, lastname, email, address
+        FROM Users
+        WHERE id = :id
+        ''', id = id)
+        return rows
+
+    @staticmethod
+    def get_seller_feedback(id):
+        rows = app.db.execute('''
+        SELECT rating, review, time_feedback
+        FROM SellerFeedback
+        WHERE sid = :id
+        ''', id = id)
+        return rows

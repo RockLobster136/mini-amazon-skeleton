@@ -279,6 +279,14 @@ def search_user():
             form.search_lastname.data = "optional"
         return render_template('find_user.html', form = form)
 
+@bp.route('/finduser/find_user_result/view_seller/<uid>', methods=['GET','POST'])
+def view_seller(uid = None):
+    if uid:
+        seller_info = User.get_seller(uid)
+        feedback = User.get_seller_feedback(uid)
+        return render_template("view_seller.html", seller_info = seller_info, feedback = feedback)
+    return None
+
 @bp.route('/history/addinventory', methods=['GET','POST'])
 def addinventory():
     if current_user.is_authenticated and current_user.isSeller:
