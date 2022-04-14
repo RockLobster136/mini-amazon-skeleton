@@ -124,7 +124,7 @@ WHERE id = :id
         temp = f"""'%{search}%'"""
         temp_2 = f"""{sort_by}"""
         rows = app.db.execute(f"""
-SELECT Pro.name as name, Pro.category as category, Pur.price as price, Pur.quantity as quantity, Pur.time_purchased as date_pur, Pur.sid as seller
+SELECT Pro.name as name, Pro.category as category, Pur.price as price, Pur.quantity as quantity, Pur.time_purchased as date_pur, Pur.sid as seller, Pur.order_id as order_id, Pur.order_status as order_status
 FROM Purchases Pur
 JOIN Products Pro
 ON Pur.pid = Pro.id
@@ -157,7 +157,7 @@ ORDER BY {temp_2} DESC, order_id """
     @staticmethod
     def get_pur(id):
         rows = app.db.execute(f"""
-SELECT Pro.name as name, Pro.category as category, Pur.price*Pur.quantity as amount, Pur.time_purchased as date_pur
+SELECT Pro.name as name, Pro.category as category, Pur.price*Pur.quantity as amount, Pur.time_purchased as date_pur, Pur.order_id as order_id, Pur.order_status as order_status
 FROM Purchases Pur
 JOIN Products Pro
 ON Pur.pid = Pro.id

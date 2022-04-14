@@ -50,6 +50,8 @@
       <th scope="col">Product Name</th>
       <th scope="col">Amount</th>
       <th scope="col">Date</th>
+      <th scope="col">Order id</th>
+      <th scope="col">Order Status</th>
       <th scope="col">Review</th>
     </tr>
   </thead>
@@ -60,6 +62,8 @@
         <td>{{purchase.name}}</td>
         <td>{{purchase.amount}}</td>
         <td>{{purchase.date_pur}}</td>
+	<td>{{purchase.order_id}}</td>
+	<td>{{purchase.order_status}}</td>
       </tr>
     {% endfor %}
   </tbody>
