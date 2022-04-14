@@ -157,7 +157,7 @@ ORDER BY {temp_2} DESC, order_id """
     @staticmethod
     def get_pur(id):
         rows = app.db.execute(f"""
-SELECT Pro.name as name, Pro.category as category, Pur.price*Pur.quantity as amount, Pur.time_purchased as date_pur, Pur.order_id as order_id, Pur.order_status as order_status
+SELECT Pur.id as id, Pro.name as name, Pro.category as category, Pur.price*Pur.quantity as amount, Pur.time_purchased as date_pur, Pur.order_status as order_status
 FROM Purchases Pur
 JOIN Products Pro
 ON Pur.pid = Pro.id
@@ -165,4 +165,63 @@ WHERE Pur.uid = :id
 ORDER BY Pur.time_purchased DESC"""
 ,
                               id = id)
+        return rows
+
+    @staticmethod
+    def search_user(firstname, lastname, role):
+        r = 100
+        if role == "Buyer":
+            r = False
+        if role == "Seller":
+            r = True
+        if r != 100:
+            switch = f""" """
+        else:
+            switch = f"""--"""
+        if firstname != "optional" or lastname != "optional":
+            if firstname == "optional" and lastname != "optional":
+                lower = lastname.lower()
+                name_field = f"""lastname"""
+            if firstname != "optional" and lastname == "optional":
+                lower = firstname.lower()
+                name_field = f"""firstname"""
+            temp = f"""'%{lower}%'"""
+            rows = app.db.execute(f"""
+SELECT id, firstname, lastname, isseller
+FROM Users
+WHERE LOWER({name_field}) LIKE {temp}
+{switch} AND isSeller = {r}
+ORDER BY id""")
+            return rows
+        if firstname != "optional" and lastname != "optional":
+            lower = firstname.lower()
+            temp = f"""'%{lower}%'"""
+            lower_2 = lastname.lower()
+            temp_2 = f"""'%{lower_2}%'"""
+            rows = app.db.execute(f"""
+SELECT id, firstname, lastname, isseller
+FROM Users
+WHERE LOWER(firstname) LIKE {temp}
+AND LOWER(lastname) LIKE {temp_2}
+{switch} AND isSeller = {r}
+ORDER BY id""")
+            return rows
+        return None
+
+    @staticmethod
+    def get_seller(id):
+        rows = app.db.execute('''
+        SELECT id, firstname, lastname, email, address
+        FROM Users
+        WHERE id = :id
+        ''', id = id)
+        return rows
+
+    @staticmethod
+    def get_seller_feedback(id):
+        rows = app.db.execute('''
+        SELECT rating, review, time_feedback
+        FROM SellerFeedback
+        WHERE sid = :id
+        ''', id = id)
         return rows

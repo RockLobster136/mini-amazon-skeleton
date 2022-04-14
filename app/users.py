@@ -200,10 +200,7 @@ def history():
                 current_user.id, datetime.datetime(1980, 9, 14, 0, 0, 0))
             
         else:
-            record = Purchase.get_all_by_uid_since(
-                current_user.id, datetime.datetime(1980, 9, 14, 0, 0, 0))
-            print(record[0].prodname)
-            print(record[0].podcat)
+            record = User.get_pur(current_user.id)
     else:
         record = None
     return render_template('history.html',
@@ -258,6 +255,37 @@ def search():
         if not form.date_h.data:
             form.date_h.data = datetime.datetime.now()
         return render_template('search.html', form = form,order_search = False)
+
+class SearchForm_user(FlaskForm):
+    search_firstname = StringField('User First Name')
+    search_lastname = StringField('User Last Name')
+    search_role = SelectField('User Role', choices = ["Buyer","Seller","All"])
+    submit = SubmitField('Search')
+
+@bp.route("/finduser", methods=['GET','POST'])
+def search_user():
+    form = SearchForm_user()
+    if form.validate_on_submit():
+        if User.search_user(form.search_firstname.data.lower(), form.search_lastname.data.lower(), form.search_role.data):
+            result = User.search_user(form.search_firstname.data.lower(), form.search_lastname.data.lower(), form.search_role.data)
+            return render_template('find_user_result.html', result = result)
+        else:
+            flash("We need more information for find the person you want. Please try again.")
+            return render_template('find_user.html', form = form)
+    else:
+        if not form.search_firstname.data:
+            form.search_firstname.data = "optional"
+        if not form.search_lastname.data:
+            form.search_lastname.data = "optional"
+        return render_template('find_user.html', form = form)
+
+@bp.route('/finduser/find_user_result/view_seller/<uid>', methods=['GET','POST'])
+def view_seller(uid = None):
+    if uid:
+        seller_info = User.get_seller(uid)
+        feedback = User.get_seller_feedback(uid)
+        return render_template("view_seller.html", seller_info = seller_info, feedback = feedback)
+    return None
 
 @bp.route('/history/addinventory', methods=['GET','POST'])
 def addinventory():
@@ -336,11 +364,10 @@ def manage_orders(oid = None):
 @bp.route('/orders/view/<oid>', methods=['GET','POST'])
 def view_order(oid = None):
     if oid:
-        print(oid)
         order_detail = Purchase.get_seller_order_view(oid)
         seller_info = Purchase.get_seller_info(oid)
-        return render_template("view.html",order_detail = order_detail,seller_info = seller_info)
-    return render_template("view.html",order_detail = None,seller_info =None)
+        return render_template("view.html", order_detail = order_detail, seller_info = seller_info)
+    return render_template("view.html", order_detail = None, seller_info = None)
 
 
 class SearchForm(FlaskForm):
