@@ -528,4 +528,19 @@ def edit_feedback(feedback_id = None, isseller = None):
                     return render_template('edit_feedback.html', form = form)
         return render_template('edit_feedback.html', form = form)
 
+@bp.route('/info/balance_hist', methods=['GET','POST'])
+def view_balance():
+    if User.get_balance_hist(current_user.id):
+        result = User.get_balance_hist(current_user.id)
+        return render_template('balance_hist.html', result = result)
+    else:
+        return redirect(url_for('users.info'))
+
+
+
+
+
+
+
+
 

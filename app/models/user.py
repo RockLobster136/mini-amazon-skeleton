@@ -225,3 +225,13 @@ ORDER BY id""")
         WHERE sid = :id
         ''', id = id)
         return rows
+
+    @staticmethod
+    def get_balance_hist(id):
+        rows = app.db.execute('''
+        SELECT id, category, start, amount, start-amount as end, time_changed
+        FROM BalanceHistory
+        WHERE uid = :id
+        ORDER BY time_changed DESC
+        ''', id = id)
+        return rows
