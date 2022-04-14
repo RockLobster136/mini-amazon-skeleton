@@ -51,6 +51,9 @@ class Cart:
                                  WHERE inventory_id=:inventory_id AND buyer_id=:buyer_id;''',
                               buyer_id=buyer_id, inventory_id=inventory_id, quantity=quantity)
         return rows
+    
+    @staticmethod
+    def update_balance():
 
     @staticmethod
     def place_order(buyer_id):
