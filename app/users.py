@@ -270,7 +270,7 @@ def search_user():
             result = User.search_user(form.search_firstname.data.lower(), form.search_lastname.data.lower(), form.search_role.data)
             return render_template('find_user_result.html', result = result)
         else:
-            flash("Invalid search. Please try again.")
+            flash("We need more information for find the person you want. Please try again.")
             return render_template('find_user.html', form = form)
     else:
         if not form.search_firstname.data:
