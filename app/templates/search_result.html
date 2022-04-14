@@ -59,10 +59,10 @@
         <td>{{order_detail.fulfill_date}}</td>
       </tr>
     {% endfor %}
-    <a class="btn btn-secondary" href="{{ url_for('users.order_search') }}" role="button">Return to search</a>
-<a class="btn btn-secondary" href="{{ url_for('users.orders') }}" role="button">Return to history</a>
   </tbody>
 </table>
+<a class="btn btn-secondary" href="{{ url_for('users.order_search') }}" role="button">Return to search</a>
+<a class="btn btn-secondary" href="{{ url_for('users.orders') }}" role="button">Return to Orders</a>
 
 
 {%else%}

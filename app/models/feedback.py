@@ -7,7 +7,6 @@ class ProductFeedback:
     def __init__(self, id, uid, pid, product_name, rating, review, upvotes, time_feedback):
         self.id = id
         self.uid = uid # buyer(reviewer) id
-        #self.sid = sid # reviewed seller id
         self.pid = pid # reviewed product id
         self.product_name = product_name
         self.rating = rating
@@ -114,7 +113,6 @@ class ProductFeedback:
         WHERE Products.available = :available
         ORDER BY Products.name
         ''', available = available)
-        print(rows[0])
         return [Product(*row) for row in rows]
 
 
