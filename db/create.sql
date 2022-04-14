@@ -74,7 +74,8 @@ CREATE TABLE Carts(
     uid INT NOT NULL REFERENCES Users(id), -- buyer id
     iid INT NOT NULL REFERENCES Inventory(id), -- get price, quantity, seller
     time_added timestamp without time zone NOT NULL DEFAULT (current_timestamp AT TIME ZONE 'UTC'),
-    quantity INT NOT NULL CHECK (quantity >= 0) -- buyer's quantity
+    quantity INT NOT NULL CHECK (quantity >= 0), -- buyer's quantity
+    save_for_later BOOLEAN NOT NULL DEFAULT FALSE
 );
 
 CREATE TABLE Rating(
