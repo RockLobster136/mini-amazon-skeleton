@@ -5,6 +5,8 @@
 {% if current_user.is_authenticated and current_user.isSeller %}
 <h6>Your Inventory:</h6>
 
+<br><br>
+
 <a class="btn btn-secondary" href="{{ url_for('users.addinventory') }}" role="button">Add Inventory</a>
 <a class="btn btn-secondary" href="{{ url_for('users.addinventory') }}" role="button">Inventory Insights</a>
 <table class='table table-hover table-bordered container'>
