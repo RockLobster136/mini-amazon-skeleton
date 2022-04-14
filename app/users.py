@@ -182,10 +182,15 @@ def fund():
             if new_balance < 0:
                 flash("Insufficient Fund.")
                 return render_template('fund.html', accountnum = id, form = form)
-            if User.mgmt_fund(id,new_balance):
-                return render_template('info.html', accountnum = id, firstname = current_user.firstname,
-                lastname = current_user.lastname, email = current_user.email, balance = new_balance, address = current_user.address)
-            flash("Something is wrong! Please try again!")
+            if form.amount.data >= 0:
+                cat = 3
+            else:
+                cat = 4
+            if User.fund_balance(id,current_user.balance,form.amount.data,cat):    
+                if User.mgmt_fund(id,new_balance):
+                    return render_template('info.html', accountnum = id, firstname = current_user.firstname,
+                    lastname = current_user.lastname, email = current_user.email, balance = new_balance, address = current_user.address)
+                    flash("Something is wrong! Please try again!")
         else:
             flash("Enter a negative amount for withdrawal.")
             return render_template('fund.html', accountnum = id, form = form)

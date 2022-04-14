@@ -120,6 +120,25 @@ WHERE id = :id
         return User.get(id)
 
     @staticmethod
+    def fund_balance(uid, start, amount, category):
+        num = app.db.execute("""
+        SELECT COUNT(1) FROM BalanceHistory
+        """
+        )
+        next_id = num[0][0]
+        rows = app.db.execute("""
+INSERT INTO BalanceHistory(id, start, amount, pid, uid, category)
+VALUES(:id, :start, :amount, NULL, :uid, :category)
+RETURNING id
+""",
+                              id = next_id,
+                              start = start,
+                              amount = amount,
+                              uid = uid,
+                              category = category)
+        return rows
+
+    @staticmethod
     def search_pur(id, search, sort_by, val_l, val_h, d_l, d_h):
         temp = f"""'%{search}%'"""
         temp_2 = f"""{sort_by}"""
@@ -229,7 +248,7 @@ ORDER BY id""")
     @staticmethod
     def get_balance_hist(id):
         rows = app.db.execute('''
-        SELECT id, category, start, amount, start-amount as end, time_changed
+        SELECT id, category, start, amount, start+amount as end, time_changed
         FROM BalanceHistory
         WHERE uid = :id
         ORDER BY time_changed DESC
