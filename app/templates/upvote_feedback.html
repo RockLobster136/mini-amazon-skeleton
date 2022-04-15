@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h5>Upvote feedbacks</h5>
+
+<h7>Very helpful adds 3 points of upvote score</h7> <br/>
+<h7>Helpful adds 1 points of upvote score</h7> <br/>
+<h7>Not helpful deducts 1 points of upvote score</h7> <br/>
+
+<br/>
+
+<form action="" method="post" novalidate>
+  {{ form.hidden_tag() }}
+  <p>
+    {{ form.upvote.label }}<br/>
+    {{ form.upvote(size=1) }}<br/>
+  </p>
+  <p>
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <ul>
+      {% for message in messages %}
+      <li>{{ message }}</li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+    {% endwith %}
+  </p>
+  <p>{{ form.submit() }}</p>
+</form>
+<a class="btn btn-secondary" href="{{ url_for('users.feedback') }}" role="button">return</a>
+{% endblock %}

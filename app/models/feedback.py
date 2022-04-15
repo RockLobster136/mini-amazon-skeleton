@@ -115,6 +115,52 @@ class ProductFeedback:
         ''', available = available)
         return [Product(*row) for row in rows]
 
+    @staticmethod
+    def upvote_product_review(id, update):
+        '''
+        id: feedback id
+        update: change of num of upvotes
+        '''
+        rows = app.db.execute('''
+        UPDATE ProductFeedback
+        SET upvotes = upvotes + :update
+        WHERE id = :id
+        RETURNING id
+        ''',
+        id = id, update = update)
+        if len(rows)>0:
+            return rows[0][0]
+        else:
+            return None
+
+# new
+    @staticmethod
+    def check_purchase_product(uid, pid):
+        rows = app.db.execute('''
+        SELECT id
+        FROM Purchases
+        WHERE uid = :uid AND pid = :pid
+        ''', 
+        uid = uid,
+        pid = pid)
+        if len(rows)>0:
+            return True
+        else:
+            return False
+
+    @staticmethod
+    def find_product_feedbackid(uid, pid):
+        rows = app.db.execute('''
+        SELECT id
+        FROM ProductFeedback
+        WHERE uid = :uid AND pid = :pid
+        ''', 
+        uid = uid,
+        pid = pid)
+        if len(rows)>0:
+            return rows[0][0]
+        else:
+            return None
 
 # seller feedback
 
@@ -206,3 +252,67 @@ class SellerFeedback:
             else:
                 return None
 
+    @staticmethod
+    def upvote_seller_review(id, update):
+        '''
+        id: feedback id
+        update: change of num of upvotes
+        '''
+        rows = app.db.execute('''
+        UPDATE SellerFeedback
+        SET upvotes = upvotes + :update
+        WHERE id = :id
+        RETURNING id
+        ''',
+        id = id, update = update)
+        if len(rows)>0:
+            return rows[0][0]
+        else:
+            return None
+
+    @staticmethod
+    def seller_feedback_summary(sid):
+        rows = app.db.execute('''
+        SELECT avg_rating, rank
+        (SELECT sid, avg_rating, RANK() OVER (ORDER BY avg_rating) AS rank
+        FROM (SELECT sid, AVG(rating) AS avg_rating
+        FROM SellerFeedback
+        GROUP BY sid) AS t1) AS t2
+        WHERE sid = :sid
+        ''', 
+        sid = sid
+        )
+        if len(rows)>0:
+            return rows[0]
+        else:
+            return [-1,-1] # return -1 when no feedback
+
+# new
+    @staticmethod
+    def check_purchase_seller(uid, sid):
+        rows = app.db.execute('''
+        SELECT id
+        FROM Purchases
+        WHERE uid = :uid AND sid = :sid
+        ''', 
+        uid = uid,
+        sid = sid)
+        if len(rows)>0:
+            return True
+        else:
+            return False
+
+
+    @staticmethod
+    def find_seller_feedbackid(uid, sid):
+        rows = app.db.execute('''
+        SELECT id
+        FROM SellerFeedback
+        WHERE uid = :uid AND sid = :sid
+        ''', 
+        uid = uid,
+        sid = sid)
+        if len(rows)>0:
+            return rows[0][0]
+        else:
+            return None

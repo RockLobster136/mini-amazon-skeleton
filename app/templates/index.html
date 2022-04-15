@@ -12,7 +12,9 @@
       <th scope="col">Product Name</th>
       <th scope="col">Category</th>
       <th scope="col">Average Rating</th>
-      <th scope="col">Count Rating</th>
+      <th scope="col">Rating Count</th>
+      <th scope="col">Action</th>
+
     </tr>
   </thead>
   <tbody>
@@ -28,7 +30,12 @@
         <td>No Rating</td>
         <td>No Rating</td>
         {% endif %}
-
+        {% with pid = product.id %}
+        <td> <a class="btn btn-secondary" 
+          href="{{ url_for('users.view_prod',pid = product.id) }}" 
+          role="button">View Product</a>
+        </td>
+        {% endwith %}
       </tr>
     {% endfor %}
   </tbody>

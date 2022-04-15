@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<br><br>
+
+<h2>Product Page:</h2>
+This is the product page for  {{pid}}
+<br>
+{% if review_status == "can review" %}
+<a class="btn btn-secondary" 
+    href="{{ url_for('users.add_feedback', isseller='No', pid = pid, sid=None) }}" 
+    role="button">Add Your Feedback of this Product Here</a>
+{%elif review_status == "can update" %}
+<td> <a class="btn btn-secondary" 
+    href="{{ url_for('users.edit_feedback',pid = pid, feedback_id = feedback_id, isseller = 'No') }}" 
+    role="button">Update feedback</a>
+{% else %}
+    You cannot review this product for now. Feedbacks can be leaved after purchasing
+{% endif %}
+
+<br>
+<td> <a class="btn btn-secondary" 
+    href="{{ url_for('index.index') }}" 
+    role="button">Return to Home Page</a>
+
+{% endblock %}
