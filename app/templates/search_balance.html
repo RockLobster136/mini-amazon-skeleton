@@ -3,7 +3,6 @@
 {% block content %}
 
 <h3>Filter Your Balance History</h3>
-<a class="btn btn-secondary" href="{{ url_for('users.view_balance') }}" role="button">Cancel</a>
 
 <form action="" method="post">
   {{ form.hidden_tag() }}
@@ -41,4 +40,5 @@
   </p>
   <p>{{ form.submit() }}</p>
 </form>
+<a class="btn btn-secondary" href="{{ url_for('users.view_balance') }}" role="button">Cancel</a>
 {% endblock %}
