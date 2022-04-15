@@ -1,5 +1,4 @@
 from flask import current_app as app
-from .user import User
 import time
 
 class Cart:
@@ -53,7 +52,20 @@ class Cart:
         return rows
     
     @staticmethod
-    def update_balance():
+    def update_balance(uid,total_price,purchase_id,category):
+        # get origianl amount
+        result = app.db.execute('''SELECT start,amount,category
+                                    FROM BalanceHistory
+                                    WHERE uid = :uid
+                                    ORDER BY time_changed DESC
+                                    LIMIT 1''',
+                                    uid = uid)
+        start, amount, category = [BalanceHistory(*result) for i in result]
+        # this is a buyer
+        if category == 1:
+            app.db.execute('''INSERT INTO BalanceHistory (start,amount,pid,uid,category)
+                               VALUES (:)''')
+        
 
     @staticmethod
     def place_order(buyer_id):
@@ -69,16 +81,15 @@ class Cart:
         timestamp = int(time.time())
         order_id = int(str(buyer_id) + str(int(time.time())))
         values = [f'({buyer_id},{row[1]},{row[5]},{row[3]},{row[4]},{order_id})' for row in rows]
-        app.db.execute(f'''INSERT INTO Purchases (uid,pid,sid,quantity,price,orderid) 
-                                    VALUES {",".join(values)}; RETURNING id;''')
+        purchase_id = app.db.execute(f'''INSERT INTO Purchases (uid,pid,sid,quantity,price,orderid) 
+                                    VALUES {",".join(values)}; RETURNING id;''')[0][0]
 
         # update inventory
         queries = [f'''UPDATE Inventory SET quantity = quantity - {row[3]} WHERE id = {row[-2]};''' for row in rows]
         app.db.execute(' '.join(queries))
 
-        ##### update balance??
-        ## ->
-        #####
+        # update balance??
+        
 
         # delete cart record
         rows = app.db.execute(f'''DELETE FROM Carts WHERE buyer_id={buyer_id};''')
