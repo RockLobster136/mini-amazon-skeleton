@@ -254,3 +254,32 @@ ORDER BY id""")
         ORDER BY time_changed DESC
         ''', id = id)
         return rows
+
+    @staticmethod
+    def filter_bal(uid,category,val_l,val_h,d_l,d_h):
+        if category == "Purchase":
+            cat = 1
+        elif category == "Sell":
+            cat = 2
+        elif category == "Deposite":
+            cat = 3
+        else:
+            cat = 4
+        rows = app.db.execute(f"""
+SELECT id, category, start, amount, start+amount as end, time_changed
+FROM BalanceHistory
+WHERE uid = :uid
+AND category = {cat}
+AND amount >= :val_l
+AND amount <= :val_h
+AND time_changed >= :d_l
+AND time_changed <= :d_h
+ORDER BY time_changed DESC """
+,
+                              uid = uid,
+                              val_l = val_l,
+                              val_h = val_h,
+                              d_l = d_l,
+                              d_h = d_h
+                              )
+        return rows
