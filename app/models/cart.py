@@ -52,19 +52,26 @@ class Cart:
         return rows
     
     @staticmethod
-    def update_balance(uid,total_price,purchase_id,category):
-        # get origianl amount
-        result = app.db.execute('''SELECT start,amount,category
-                                    FROM BalanceHistory
-                                    WHERE uid = :uid
-                                    ORDER BY time_changed DESC
-                                    LIMIT 1''',
-                                    uid = uid)
-        start, amount, category = [BalanceHistory(*result) for i in result]
-        # this is a buyer
-        if category == 1:
-            app.db.execute('''INSERT INTO BalanceHistory (start,amount,pid,uid,category)
-                               VALUES (:)''')
+    def update_balance(start,amount,pid,uid,category):
+        # # get origianl amount
+        # result = app.db.execute('''SELECT start,amount,category
+        #                             FROM BalanceHistory
+        #                             WHERE uid = :uid
+        #                             ORDER BY time_changed DESC
+        #                             LIMIT 1''',
+        #                             uid = uid)
+        # start, amount, category = [BalanceHistory(*result) for i in result]
+        # # this is a buyer
+        # if category == 1:
+        #     app.db.execute('''INSERT INTO BalanceHistory (start,amount,pid,uid,category)
+        #                        VALUES (:)''')
+        rows = app.db.execute(
+            """INSERT INTO BalanceHistory(start,amount,pid,uid,category)
+                VALUES(:start,:amount,:pid,:uid,:category)
+                RETURNING id""",
+                start = start, amount = amount, pid = pid, uid = uid, category = category
+        )
+        return rows
         
 
     @staticmethod
@@ -89,7 +96,17 @@ class Cart:
         app.db.execute(' '.join(queries))
 
         # update balance??
-        
+        amount = sum(row[3]*sum[4] for rwo in rows)
+        # update buyer
+        ## update BalanceHistory
+        Cart.update_balance(buyer_id.balance, amount, purchase_id, buyer_id,1)
+        ## update user balance
+
+        # update seller
+        for row in rows:
+            seller_id = row[5]
+            Cart.update_balance(seller_id.balance, amount, purchase_id, seller_id,2)
+        ## update seller balance
 
         # delete cart record
         rows = app.db.execute(f'''DELETE FROM Carts WHERE buyer_id={buyer_id};''')
