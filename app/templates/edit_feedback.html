@@ -27,5 +27,10 @@
   </p>
   <p>{{ form.submit() }}</p>
 </form>
-<a class="btn btn-secondary" href="{{ url_for('users.feedback') }}" role="button">return</a>
+{% if choose %}
+<a class="btn btn-secondary" href="{{ url_for('users.feedback') }}" role="button">return to feedback</a>
+{% else %}
+<a class="btn btn-secondary" href="{{ url_for('index.index') }}" role="button">return to home</a>
+{% endif %}
+
 {% endblock %}

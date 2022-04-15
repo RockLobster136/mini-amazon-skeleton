@@ -376,7 +376,7 @@ def view_order(oid = None):
 
 
 class SearchForm(FlaskForm):
-    fulfill_status = SelectField("Fulfillment Status", choice = ["Fulfilled", "Not Fulfilled"])
+    fulfill_status = SelectField("Fulfillment Status", choices = ["Fulfilled", "Not Fulfilled"])
     prodName = StringField("Product Name")
     year_range = SelectField("Recent", choices = ["1 month","3 months", "1 years","All"])
 
@@ -459,10 +459,6 @@ def low_inventory():
         else:
             flash("No Result")
     return render_template("lowInventory.html",form = form)
-    
-
-
-
 
 
 # Feedback
@@ -474,7 +470,7 @@ class FeedbackForm(FlaskForm):
     review = StringField('Review')
     delete = SelectField('Delete this review?', choices = ['No','Yes'])
     submit = SubmitField('Commit')
-
+    upvote = SelectField('Upvote', choices = ['Not Helpful', 'Helpful', 'Very Helpful'])
 
 @bp.route('/feedback', methods=['GET','POST'])
 def feedback():
@@ -487,11 +483,11 @@ def feedback():
         return render_template('feedback.html', product_feedbacks = None, seller_feedbacks = None)
 
 @bp.route('/feedback/add_feedback/<isseller>', methods=['GET','POST'])
-def add_feedback(isseller =None):
-    # retrive buyer's feedbacks
+def add_feedback(isseller =None, pid = None, sid = None):
     if current_user.is_authenticated:
+        choose = False
         form = FeedbackForm()
-        if isseller == "Yes":
+        if isseller == "Yes": # review seller
             sids = SellerFeedback.non_reviewed_sellers(current_user.id)
             choices = [User.get_user_name(sid)[0] for sid in sids]
             form.sellerName.choices = choices
@@ -501,29 +497,35 @@ def add_feedback(isseller =None):
                 if SellerFeedback.add_feedback(current_user.id, sid, form.rating.data, form.review.data):
                     flash("Succesfully added review!")
                     return render_template('add_feedback.html', form=form,isseller = isseller)
-        else:
+        else: # review product
             choices = ProductFeedback.non_reviewed_products(current_user.id)
             form.prodName.choices = choices
             if form.rating.data:
-                pid = Product.prod_find(form.prodName.data)
+                if not pid:
+                    pid = Product.prod_find(form.prodName.data)
+                    choose = True
                 if ProductFeedback.add_feedback(current_user.id, pid, form.rating.data, form.review.data):
                     flash("Succesfully added review!")
-        return render_template('add_feedback.html', form=form,isseller = isseller)
+        return render_template('add_feedback.html', form=form,isseller = isseller, choose = choose)
     else:
         return render_template('add_feedback.html', form=None,isseller = None)
 
 @bp.route('/feedback/edit_feedback/<feedback_id>-<isseller>', methods=['GET','POST'])
-def edit_feedback(feedback_id = None, isseller = None):
+def edit_feedback(feedback_id = None, isseller = None, pid = None, sid = None):
     if feedback_id:
         form = FeedbackForm()
+        choose = False
         if form.rating.data or form.review.data or form.delete.data:
             if isseller == "No":
+                if pid:
+                    choose = True
+                print(choose,1)
                 if ProductFeedback.update_product_review(feedback_id, form.rating.data, form.review.data, form.delete.data == 'Yes'):
                     if form.delete.data == "Yes":
                         flash("Successfully deleted review")
                     else:
                         flash("Successfully edited review")
-                    return render_template('edit_feedback.html', form = form)
+                    return render_template('edit_feedback.html', form = form, choose = choose)
             else:
                 if SellerFeedback.update_seller_review(feedback_id, form.rating.data, form.review.data, form.delete.data == 'Yes'):
                     if form.delete.data == "Yes":
@@ -533,48 +535,57 @@ def edit_feedback(feedback_id = None, isseller = None):
                     return render_template('edit_feedback.html', form = form)
         return render_template('edit_feedback.html', form = form)
 
-@bp.route('/info/balance_hist', methods=['GET','POST'])
-def view_balance():
-    if User.get_balance_hist(current_user.id):
-        result = User.get_balance_hist(current_user.id)
-        return render_template('balance_hist.html', result = result)
-    else:
-        return redirect(url_for('users.info'))
-
-class FilterBalForm(FlaskForm):
-    category = SelectField('Transaction Category', choices = ["Purchase","Sell","Deposite","Withdrawal"],validators = [DataRequired()])
-    value_l = DecimalField('Amount Lower Bound')
-    value_h = DecimalField('Amount Upper Bound')
-    date_l = DateField('Date Earliest', format='%m/%d/%Y')
-    date_h = DateField('Date Latest', format='%m/%d/%Y')
-    submit = SubmitField('Apply Filters')
-
-@bp.route('/info/balance_hist/filter', methods=['GET','POST'])
-def filter_balance():
-    form = FilterBalForm()
-    if form.validate_on_submit():
-        if User.filter_bal(current_user.id, form.category.data,form.value_l.data, form.value_h.data,form.date_l.data,form.date_h.data):
-            result = User.filter_bal(current_user.id, form.category.data, form.value_l.data, form.value_h.data,form.date_l.data,form.date_h.data)
-            return render_template('search_balance_result.html', result = result)
+@bp.route('/feedback/upvote_feedback/<feedback_id>-<isseller>', methods=['GET','POST'])
+def upvote_feedback(feedback_id = None, isseller = None):
+    if feedback_id:
+        form = FeedbackForm()
+        if form.upvote.data:
+            upvote_change = form.upvote.data
+            upvote_dict = {'Not Helpful':-1, 'Helpful':1, 'Very Helpful':3}
+            if isseller == "Yes":
+                if SellerFeedback.upvote_seller_review(feedback_id, upvote_dict[upvote_change]):
+                    flash("Successfully upvoted!")
+                    return render_template('upvote_feedback.html', form = form)
+            else:
+                if ProductFeedback.upvote_product_review(feedback_id, upvote_dict[upvote_change]):
+                    flash("Successfully upvoted!")
+                    return render_template('upvote_feedback.html', form = form)
+            return render_template('upvote_feedback.html', form = form)
         else:
-            flash("Invalid filter. Please try again!")
-            return render_template('search_balance.html', form = form)
-    else:
-        if not form.value_l.data:
-            form.value_l.data = 0
-        if not form.value_h.data:
-            form.value_h.data = 9999999999999999
-        if not form.date_l.data:
-            form.date_l.data = datetime.datetime(1980, 9, 14, 0, 0, 0)
-        if not form.date_h.data:
-            form.date_h.data = datetime.datetime.now()
-        return render_template('search_balance.html', form = form)
+            return render_template('upvote_feedback.html', form = form)
 
+# review button in product page
+#@bp.route('/feedback/add_feedback/<isseller>', methods=['GET','POST'])
+''''
+def add_feedback_productpage():
+    if current_user.is_authenticated:
+        if ProductFeedback.check_purchase_product(current_user.id, ^pid ): # purchased
+            feedback_id = ProductFeedback.check_feedback_product(current_user.id, ^pid)
+            if feedback_id: # reviewed
+                if ProductFeedback.update_product_review(feedback_id, form.rating.data, form.review.data, form.delete.data == 'Yes'):
+                    if form.delete.data == "Yes":
+                        flash("Successfully deleted review")
+            else: # not reviewed
+                if ProductFeedback.add_feedback(current_user.id, pid, form.rating.data, form.review.data):
+                    flash("Succesfully added review!")
+        else: # not purchased
+            flash("Please purchase the product before adding feedbacks!")
+'''
 
-
-
-
-
-
-
-
+@bp.route('/view_prod/<pid>', methods=['GET','POST'])
+def view_prod(pid =None):
+    print(pid)
+    if pid:
+        if current_user.is_authenticated:
+            if ProductFeedback.check_purchase_product(current_user.id, pid): # purchased
+                feedback_id = ProductFeedback.find_product_feedbackid(current_user.id, pid)
+                if feedback_id: # reviewed
+                    review_status = "can update"
+                    return render_template("view_prod.html",pid = pid, feedback_id = feedback_id, review_status = review_status ) # pass in fid
+                else: # not reviewed
+                    review_status = "can review"
+            else: # not purchased
+                review_status = "cannot review"
+        return render_template("view_prod.html",pid = pid, review_status = review_status )
+    print(pid)
+    return render_template("view_prod.html")

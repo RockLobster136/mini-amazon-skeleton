@@ -13,8 +13,10 @@
       {{ form.sellerName.label }}<br/>
       {{ form.sellerName(size=1) }}<br/>
       {% else %}
+      {% if choose %}
       {{ form.prodName.label }}<br/>
       {{ form.prodName(size=1) }}<br/>
+      {% endif %}
       {% endif %}
       {{ form.rating.label }}<br/>
       {{ form.rating(size=1) }}<br/>
@@ -36,5 +38,9 @@
 
     <p>{{ form.submit() }}</p>
 </form>
+{% if choose %}
 <a class="btn btn-secondary" href="{{ url_for('users.feedback') }}" role="button">return</a>
+{% else %}
+<a class="btn btn-secondary" href="{{ url_for('index.index') }}" role="button">return</a>
+{% endif %}
 {% endblock %}
