@@ -120,6 +120,25 @@ WHERE id = :id
         return User.get(id)
 
     @staticmethod
+    def fund_balance(uid, start, amount, category):
+        num = app.db.execute("""
+        SELECT COUNT(1) FROM BalanceHistory
+        """
+        )
+        next_id = num[0][0]
+        rows = app.db.execute("""
+INSERT INTO BalanceHistory(id, start, amount, pid, uid, category)
+VALUES(:id, :start, :amount, NULL, :uid, :category)
+RETURNING id
+""",
+                              id = next_id,
+                              start = start,
+                              amount = amount,
+                              uid = uid,
+                              category = category)
+        return rows
+
+    @staticmethod
     def search_pur(id, search, sort_by, val_l, val_h, d_l, d_h):
         temp = f"""'%{search}%'"""
         temp_2 = f"""{sort_by}"""
@@ -157,7 +176,7 @@ ORDER BY {temp_2} DESC, order_id """
     @staticmethod
     def get_pur(id):
         rows = app.db.execute(f"""
-SELECT Pro.name as name, Pro.category as category, Pur.price*Pur.quantity as amount, Pur.time_purchased as date_pur, Pur.order_id as order_id, Pur.order_status as order_status
+SELECT Pur.id as id, Pro.name as name, Pro.category as category, Pur.price*Pur.quantity as amount, Pur.time_purchased as date_pur, Pur.order_status as order_status
 FROM Purchases Pur
 JOIN Products Pro
 ON Pur.pid = Pro.id
@@ -165,4 +184,102 @@ WHERE Pur.uid = :id
 ORDER BY Pur.time_purchased DESC"""
 ,
                               id = id)
+        return rows
+
+    @staticmethod
+    def search_user(firstname, lastname, role):
+        r = 100
+        if role == "Buyer":
+            r = False
+        if role == "Seller":
+            r = True
+        if r != 100:
+            switch = f""" """
+        else:
+            switch = f"""--"""
+        if firstname != "optional" or lastname != "optional":
+            if firstname == "optional" and lastname != "optional":
+                lower = lastname.lower()
+                name_field = f"""lastname"""
+            if firstname != "optional" and lastname == "optional":
+                lower = firstname.lower()
+                name_field = f"""firstname"""
+            temp = f"""'%{lower}%'"""
+            rows = app.db.execute(f"""
+SELECT id, firstname, lastname, isseller
+FROM Users
+WHERE LOWER({name_field}) LIKE {temp}
+{switch} AND isSeller = {r}
+ORDER BY id""")
+            return rows
+        if firstname != "optional" and lastname != "optional":
+            lower = firstname.lower()
+            temp = f"""'%{lower}%'"""
+            lower_2 = lastname.lower()
+            temp_2 = f"""'%{lower_2}%'"""
+            rows = app.db.execute(f"""
+SELECT id, firstname, lastname, isseller
+FROM Users
+WHERE LOWER(firstname) LIKE {temp}
+AND LOWER(lastname) LIKE {temp_2}
+{switch} AND isSeller = {r}
+ORDER BY id""")
+            return rows
+        return None
+
+    @staticmethod
+    def get_seller(id):
+        rows = app.db.execute('''
+        SELECT id, firstname, lastname, email, address
+        FROM Users
+        WHERE id = :id
+        ''', id = id)
+        return rows
+
+    @staticmethod
+    def get_seller_feedback(id):
+        rows = app.db.execute('''
+        SELECT rating, review, time_feedback
+        FROM SellerFeedback
+        WHERE sid = :id
+        ''', id = id)
+        return rows
+
+    @staticmethod
+    def get_balance_hist(id):
+        rows = app.db.execute('''
+        SELECT id, category, start, amount, start+amount as end, time_changed
+        FROM BalanceHistory
+        WHERE uid = :id
+        ORDER BY time_changed DESC
+        ''', id = id)
+        return rows
+
+    @staticmethod
+    def filter_bal(uid,category,val_l,val_h,d_l,d_h):
+        if category == "Purchase":
+            cat = 1
+        elif category == "Sell":
+            cat = 2
+        elif category == "Deposite":
+            cat = 3
+        else:
+            cat = 4
+        rows = app.db.execute(f"""
+SELECT id, category, start, amount, start+amount as end, time_changed
+FROM BalanceHistory
+WHERE uid = :uid
+AND category = {cat}
+AND amount >= :val_l
+AND amount <= :val_h
+AND time_changed >= :d_l
+AND time_changed <= :d_h
+ORDER BY time_changed DESC """
+,
+                              uid = uid,
+                              val_l = val_l,
+                              val_h = val_h,
+                              d_l = d_l,
+                              d_h = d_h
+                              )
         return rows

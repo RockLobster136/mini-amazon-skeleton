@@ -54,6 +54,7 @@
           Hello {{current_user.firstname}} <br> {{current_user.welcometext}}! 
 	  <br>
 	  <a href="{{ url_for('index.index') }}" type="button" class="btn btn-light">Home</a>
+	  <a href="{{ url_for('users.search_user') }}" type="button" class="btn btn-light">Find User</a>
 	  <a href="{{ url_for('users.info') }}" type="button" class="btn btn-light">My Account</a>
 	  <a href="{{ url_for('users.history') }}" type="button" class="btn btn-light">My History</a>
     {% if not current_user.isSeller %}

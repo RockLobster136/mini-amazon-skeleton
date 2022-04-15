@@ -5,8 +5,6 @@
 <br><br>
 
 <h3>My Account:</h3>
-<a class="btn btn-secondary" href="{{ url_for('users.edit_info') }}" role="button">Edit Profile</a>
-<a class="btn btn-secondary" href="{{ url_for('users.change_password') }}" role="button">Change Password</a>
 <br>
 
 <body>
@@ -32,6 +30,8 @@
   <p> This is your Buyer's account <p>
     {% endif %}
   <p>
+  <a class="btn btn-secondary" href="{{ url_for('users.edit_info') }}" role="button">Edit Profile</a>
+  <a class="btn btn-secondary" href="{{ url_for('users.change_password') }}" role="button">Change Password</a>
     {% with messages = get_flashed_messages() %}
     {% if messages %}
     <ul>
@@ -51,4 +51,5 @@
   </p>
 </body>
 <a class="btn btn-secondary" href="{{ url_for('users.fund') }}" role="button">Manage Fund</a>
+<a class="btn btn-secondary" href="{{ url_for('users.view_balance') }}" role="button">Balance History</a>
 {% endblock %}
