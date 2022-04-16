@@ -57,7 +57,7 @@ class SearchForm_prod(FlaskForm):
 def searchProduct():
     form = SearchForm_prod()
     if form.validate_on_submit():
-        form.cat.choices = Product.get_prod_cat()
+        form.cat.choices = ["All"] + Product.get_prod_cat()
         if Product.search_prod(from.name.data.lower(), form.sort_by.data, form.firstname.data.lower(), form.search_lastname.data.lower(), form.des.data.lower(),
         form.cat.data, form.price_l.data, form.price_h.data, form.rating_l.data, form.rating_h.data, form.avail.data):
             result = Product.search_prod(from.name.data.lower(), form.sort_by.data, form.firstname.data.lower(), form.search_lastname.data.lower(), form.des.data.lower(),
@@ -73,6 +73,8 @@ def searchProduct():
             form.search_lastname.data = "optional"
         if not form.des.data:
             form.des.data = "optional"
+        if not form.cat.data:
+            form.cat.data = "All"
         if not form.price_l.data:
             form.price_l.data = 0
         if not form.price_h.data:

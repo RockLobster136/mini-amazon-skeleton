@@ -145,10 +145,15 @@ SELECT *
 FROM Categories
 ''')    
         return [row[1] for row in rows]
-
     @staticmethod
     def search_prod(prod_name, sort_by, sell_fn, sell_ln, des, cat, price_l, price_h, rating_l, rating_h, avail):
         product_n = f"""'%{prod_name}%'"""
+        if cat != "All":
+            cate = f"""{cat}"""
+            cate_switch = f""" """
+        else:
+            cate = f""" """
+            cate_switch = f"""--"""
         if sort_by == "price":
             product_sort = f"""{sort_by}"""
         else:
@@ -179,13 +184,18 @@ FROM Inventory I JOIN Users U ON I.sid = U.id),
 ratings(pid, rating) as
 (SELECT pid, rating
 FROM ProductFeedback)
+cat_temp(id, name) as
+(SELECT id, name
+FROM Categories
+{cate_switch} WHERE name = {cate})
 
-SELECT pro.id as id, pro.name as name, iu.price and pirce, iu.quantity as avail,
+SELECT pro.id as id, ca.name as ca_name, pro.name as name, iu.price and pirce, iu.quantity as avail,
 iu.firstname as firstname, iu.lastname as lastname, r.rating as rating, pro.description as des, pro.image as img
-FROM Products pro JOIN inv_users iu ON pro.id = iu.pid JOIN ratings r ON r.pid = pro.id
+FROM Products pro JOIN inv_users iu ON pro.id = iu.pid JOIN ratings r ON r.pid = pro.id JOIN cat_temp ca ON ca.id = pro.category
 WHERE LOWER(pro.name) LIKE {product_n}
 AND LOWER({name_field}) LIKE {temp}
 {switch_des} AND LOWER(pro.description) LIKE {des_match}
+{cate_switch} AND pro.category = {cate}
 AND inv.price >= :price_l
 AND inv.price <= :price_h
 AND r.rating >= :rating_l
@@ -211,6 +221,10 @@ FROM Inventory I JOIN Users U ON I.sid = U.id),
 ratings(pid, rating) as
 (SELECT pid, rating
 FROM ProductFeedback)
+cat_temp(id, name) as
+(SELECT id, name
+FROM Categories
+{cate_switch} WHERE name = {cate})
 
 SELECT pro.id as id, pro.name as name, iu.price and pirce, iu.quantity as avail,
 iu.firstname as firstname, iu.lastname as lastname, r.rating as rating, pro.description as des, pro.image as img
@@ -219,6 +233,7 @@ WHERE LOWER(pro.name) LIKE {product_n}
 AND LOWER(iu.firstname) LIKE {temp_fn}
 AND LOWER(iu.lastname) LIKE {temp_ln}
 {switch_des} AND LOWER(pro.description) LIKE {des_match}
+{cate_switch} AND pro.category = {cate}
 AND inv.price >= :price_l
 AND inv.price <= :price_h
 AND r.rating >= :rating_l
@@ -233,5 +248,3 @@ ORDER BY {product_sort}, id""",
             avail = avail)
             return rows
         return None
-
-    
