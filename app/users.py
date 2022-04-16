@@ -632,3 +632,9 @@ def view_prod(pid =None):
                 review_status = "cannot review"
         return render_template("view_prod.html",prod_info = prod_info,pid = pid, review_status = review_status )
     return render_template("view_prod.html")
+
+@bp.route('/redirect_to')
+def redirect_to():
+    link = request.args.get('link', '/')
+    new_link =  link
+    return redirect(new_link)

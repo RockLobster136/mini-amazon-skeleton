@@ -22,7 +22,7 @@ This is the product page for  {{pid}}
         <td>{{prod_info.name}}</td>
         <td>{{prod_info.category}}</td>
         <td>{{prod_info.description}}</td>
-        <td>{{prod_info.image}}</td>
+        <td><a href="{{ url_for('users.redirect_to', link=prod_info.image)}}">View Product Image</a></td>
         </td>
         
     </tr>
