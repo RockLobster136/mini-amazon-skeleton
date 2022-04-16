@@ -5,6 +5,7 @@ import datetime
 from .models.product import Product
 from .models.purchase import Purchase
 from .models.feedback import ProductFeedback
+from .models.inventory import Inventory
 
 from flask import Blueprint
 bp = Blueprint('index', __name__)

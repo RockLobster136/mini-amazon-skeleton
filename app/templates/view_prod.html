@@ -27,6 +27,47 @@ This is the product page for  {{pid}}
         
     </tr>
 </table>
+<br />
+<div class="container">
+    <h2>Available Sellers</h2>
+    <table class='table table-hover table-bordered container'>
+        <thead class="thead-dark">
+        <tr>
+            <th scope="col">Seller</th>
+            <th scope="col">Price</th>
+            <th scope="col">Available quantity</th>
+            <th scope="col">Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for i in inventory %}
+            <tr>
+                <th scope="row"><a href="{{ url_for('users.view_seller',uid= i.sid) }}">
+                    <div style="height:100%;width:100%">
+                        {{ i.seller_name }}
+                    </div>
+                </a></th>
+                <th scope="row">{{ i.price }}</th>
+                <td>{{ i.quantity }}</td>
+                <td>
+                    {% if current_user.is_authenticated %}
+                        <form action="{{ url_for('cart.cart') }}" method="post">
+                            <input type="hidden" name="action" value="add"/>
+                            <input type="hidden" name="inventory_id" value="{{ i.id }}"/>
+                            <input type="hidden" name="product_id" value="{{ product.id }}"/>
+                            <label for="quantity">Quantity:</label>
+                            <input type="number" id="quantity" name="quantity" min="1" max="{{ i.quantity }}" value="1">
+                            <input type="submit" value="Add to Cart">
+                        </form>
+                    {% else %}
+                        <button onclick="loginAlert()">Add to Cart</button>
+                    {% endif %}
+
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
 <br>
 {% if review_status == "can review" %}
 <a class="btn btn-secondary" 

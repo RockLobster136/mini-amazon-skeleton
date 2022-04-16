@@ -1,7 +1,7 @@
 from unicodedata import category
 from flask import current_app as app
 class Inventory:
-    def __init__(self, id, sid, pid,category,name, quantity,price,release_date):
+    def __init__(self, id, sid, pid,category,name, quantity,price,release_date,seller_firstname="",seller_lastname=""):
         self.id = id
         self.sid = sid
         self.pid = pid
@@ -10,6 +10,7 @@ class Inventory:
         self.quantity = quantity
         self.price = price
         self.release_date = release_date
+        self.seller_name = seller_firstname + " " + seller_lastname
     
     @staticmethod
     def get(id):
@@ -101,5 +102,14 @@ RETURNING id
                                 quantity = quantity)
             return [Inventory(*row) for row in rows]
 
-        
-       
+    
+    @staticmethod
+    def get_sellers_for_product(pid):
+        rows = app.db.execute(f'''
+           SELECT Inventory.id, Inventory.pid AS pid, Products.name AS name, category, Inventory.price, quantity, 
+                 Inventory.sid, Users.firstname AS seller_firstname, Users.lastname AS seller_lastname
+           FROM Inventory, Products, Users
+           WHERE Inventory.pid = Products.id AND Users.id = Inventory.sid AND Inventory.pid={pid}
+           ORDER BY price ASC
+           ''')
+        return [Inventory(*row) for row in rows]

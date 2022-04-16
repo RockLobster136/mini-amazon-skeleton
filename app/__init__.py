@@ -18,8 +18,8 @@ def create_app():
     from .index import bp as index_bp
     app.register_blueprint(index_bp)
 
-    #from .carts import bp as cart_bp
-    #app.register_blueprint(cart_bp)
+    from .carts import bp as cart_bp
+    app.register_blueprint(cart_bp)
 
     #from .products import bp as product_bp
     #app.register_blueprint(product_bp)
