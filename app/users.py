@@ -375,16 +375,6 @@ def view_order(oid = None):
     return render_template("view.html", order_detail = None, seller_info = None)
 
 
-class SearchForm(FlaskForm):
-    fulfill_status = SelectField("Fulfillment Status", choices = ["Fulfilled", "Not Fulfilled"])
-    prodName = StringField("Product Name")
-    year_range = SelectField("Recent", choices = ["1 month","3 months", "1 years","All"])
-
-@bp.route('/orders/search', methods=['GET','POST'])
-def search_order():
-    form = SearchForm()
-    if form.year_range.data == "1 month":
-        date = datetime.datetime
 
 
 
