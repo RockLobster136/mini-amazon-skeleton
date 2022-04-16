@@ -101,5 +101,14 @@ RETURNING id
                                 quantity = quantity)
             return [Inventory(*row) for row in rows]
 
-        
-       
+    
+    @staticmethod
+    def get_all_sellers_for_product(pid):
+        rows = app.db.execute(f'''
+           SELECT Inventory.id, Inventory.pid AS pid, Products.name AS name, cid, Inventory.price, quantity, sid, Users.firstname AS seller_firstname, Users.lastname AS seller_lastname
+           FROM Inventory, Products, Users
+           WHERE Inventory.pid = Products.id AND Users.id = Inventory.sid
+           AND Inventory.pid={pid}
+           ORDER BY price ASC
+           ''')
+        return [Inventory(*row) for row in rows]

@@ -12,6 +12,7 @@ class Cart:
         self.save_for_later = save_for_later
         self.product_price = product_price
     
+    # get cart info for this user
     @staticmethod
     def user_cart(buyer_id):
         rows = app.db.execute(
@@ -25,6 +26,7 @@ class Cart:
         )
         return [Cart(*rows) for row in rows]
     
+    #
     @staticmethod
     def add_to_cart(buyer_id, inventory_id, quantity, product_id):
         rows = app.db.execute(f'''SELECT quantity FROM Carts WHERE inventory_id={inventory_id} AND buyer_id={buyer_id};''')

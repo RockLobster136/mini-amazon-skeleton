@@ -42,7 +42,7 @@ def cart():
     else:
         pass
     categories = Product.get_prod_cat()
-    total_price = sum([prod.product_price * prod.quantity for prod in this_cart]) if len(_cart) > 0 else 0
+    total_price = sum([prod.product_price * prod.quantity for prod in this_cart]) if len(this_cart) > 0 else 0
     # render the page by adding information to the index.html file
     return render_template('cart.html',
                            cart=this_cart,
