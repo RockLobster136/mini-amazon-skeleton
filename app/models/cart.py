@@ -1,4 +1,6 @@
 from flask import current_app as app
+from flask_login import login_user, logout_user, current_user
+from .user import User
 import time
 
 class Cart:
@@ -55,18 +57,6 @@ class Cart:
     
     @staticmethod
     def update_balance(start,amount,pid,uid,category):
-        # # get origianl amount
-        # result = app.db.execute('''SELECT start,amount,category
-        #                             FROM BalanceHistory
-        #                             WHERE uid = :uid
-        #                             ORDER BY time_changed DESC
-        #                             LIMIT 1''',
-        #                             uid = uid)
-        # start, amount, category = [BalanceHistory(*result) for i in result]
-        # # this is a buyer
-        # if category == 1:
-        #     app.db.execute('''INSERT INTO BalanceHistory (start,amount,pid,uid,category)
-        #                        VALUES (:)''')
         rows = app.db.execute(
             """INSERT INTO BalanceHistory(start,amount,pid,uid,category)
                 VALUES(:start,:amount,:pid,:uid,:category)
@@ -90,25 +80,27 @@ class Cart:
         timestamp = int(time.time())
         order_id = int(str(buyer_id) + str(int(time.time())))
         values = [f'({buyer_id},{row[1]},{row[5]},{row[3]},{row[4]},{order_id})' for row in rows]
-        purchase_id = app.db.execute(f'''INSERT INTO Purchases (uid,pid,sid,quantity,price,orderid) 
-                                    VALUES {",".join(values)}; RETURNING id;''')[0][0]
+        purchase_id = app.db.execute(f'''INSERT INTO Purchases (uid,pid,sid,quantity,price,order_id) 
+                                    VALUES {",".join(values)} RETURNING id;''')[0][0]
 
         # update inventory
         queries = [f'''UPDATE Inventory SET quantity = quantity - {row[3]} WHERE id = {row[-2]};''' for row in rows]
         app.db.execute(' '.join(queries))
 
-        # update balance??
-        amount = sum(row[3]*sum[4] for rwo in rows)
+        # update balance
+        amount = sum(row[3]*row[4] for row in rows)
         # update buyer
         ## update BalanceHistory
-        Cart.update_balance(buyer_id.balance, amount, purchase_id, buyer_id,1)
-        ## update user balance
+        Cart.update_balance(current_user.balance, -amount, purchase_id, buyer_id,1)
+        ## update user balance？？
+        User.mgmt_fund(buyer_id,current_user.balance - amount) ### what should the sign be
 
         # update seller
         for row in rows:
             seller_id = row[5]
-            Cart.update_balance(seller_id.balance, amount, purchase_id, seller_id,2)
-        ## update seller balance
+            current_seller = User.get(seller_id)
+            Cart.update_balance(current_seller.balance, amount, purchase_id, seller_id,2)
+            User.mgmt_fund(seller_id,current_seller.balance + amount)
 
         # delete cart record
         rows = app.db.execute(f'''DELETE FROM Carts WHERE uid={buyer_id};''')

@@ -6,7 +6,7 @@
 
     <h2>Cart</h2>
     {% if current_user.is_authenticated %}
-        {% if is_checked_out_just_now %}
+        {% if checkout_now %}
             <br>
             <h2>Thank you for your order, {{ current_user.firstname }}. </h2>
             <p>Your order has been placed. </p>

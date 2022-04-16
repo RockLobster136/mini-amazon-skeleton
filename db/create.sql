@@ -46,7 +46,7 @@ CREATE TABLE Purchases (
     time_purchased timestamp without time zone NOT NULL DEFAULT (current_timestamp AT TIME ZONE 'UTC'),
     quantity INT NOT NULL CHECK (quantity >= 0), -- quant ordered
     price DECIMAL(12,2) NOT NULL ,-- price sold/bought
-    order_id INT NOT NULL, -- generated using uid + timestamp(using time.time())
+    order_id BIGINT NOT NULL, -- generated using uid + timestamp(using time.time())
     order_status BOOLEAN DEFAULT FALSE,
     fulfill_date timestamp without time zone DEFAULT(current_timestamp AT TIME ZONE 'UTC')
 );

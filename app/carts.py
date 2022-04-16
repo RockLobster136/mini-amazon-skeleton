@@ -42,7 +42,7 @@ def cart():
                 Cart.change_quantity(current_user.id, request.form['inventory_id'], new_quantity)
         if request.form['action'] == 'checkout':
             try:
-                Cart.palce_order(current_user.id)
+                Cart.place_order(current_user.id)
                 checkout_now = True
             except Exception as e:
                 checkout_error = True
@@ -55,7 +55,7 @@ def cart():
         pass
     categories = Product.get_prod_cat()
     total_price = sum([prod.product_price * prod.quantity for prod in this_cart]) if len(this_cart) > 0 else 0
-    # render the page by adding information to the index.html file
+
     return render_template('cart.html',
                            cart=this_cart,
                            categories=categories,
