@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h3>Search a Product</h3>
+<form action="" method="post">
+  {{ form.hidden_tag() }}
+  <p>
+    {{ form.name.label }}
+    {{ form.name(size=32) }}<br/>
+    {% for error in form.name.errors %}
+    <span style="color: red;">[{{ error }}]</span>
+    {% endfor %}
+  </p>
+  <p>
+    {{ form.sort_by.label }}
+    {{ form.sort_by(size=2) }}<br/>
+    {% for error in form.sort_by.errors %}
+    <span style="color: red;">[{{ error }}]</span>
+    {% endfor %}
+  </p>
+  <p>
+    {{ form.firstname.label }}
+    {{ form.firstname(size=32) }}<br/>
+
+    {{ form.lastname.label }}
+    {{ form.lastname(size=32) }}<br/>
+  </p>
+  <p>
+    {{ form.des.label }}
+    {{ form.des(size=32) }}<br/>
+  </p>
+  <p>
+    {{ form.cat.label }}
+    {{ form.cat(size=2) }}<br/>
+    {% for error in form.cat.errors %}
+    <span style="color: red;">[{{ error }}]</span>
+    {% endfor %}
+  </p>
+  <p>
+    {{ form.price_l.label }}
+    {{ form.price_l(size=32) }}<br/>
+
+    {{ form.price_h.label }}
+    {{ form.price_h(size=32) }}<br/>
+  </p>
+  <p>
+    {{ form.rating_l.label }}
+    {{ form.rating_l(size=32) }}<br/>
+
+    {{ form.rating_h.label }}
+    {{ form.rating_h(size=32) }}<br/>
+  </p>
+  <p>
+    {{ form.avail.label }}
+    {{ form.avail(size=32) }}<br/>
+  </p>
+  <p>
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <ul>
+      {% for message in messages %}
+      <li>{{ message }}</li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+    {% endwith %}
+  </p>
+  <p>{{ form.submit() }}</p>
+</form>
+<a class="btn btn-secondary" href="{{ url_for('index.index') }}" role="button">Cancel</a>
+{% endblock %}
