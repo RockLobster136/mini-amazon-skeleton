@@ -197,6 +197,31 @@ def fund():
     else:
         return redirect(url_for('users.login'))
 
+@bp.route('/info/balance_hist', methods=['GET','POST'])
+def view_balance():
+    if User.get_balance_hist(current_user.id):
+        result = User.get_balance_hist(current_user.id)
+        return render_template('balance_hist.html', result = result)
+    else:
+        return redirect(url_for('users.info'))
+
+class FilterBalForm(FlaskForm):
+    category = SelectField('Transaction Category', choices = ["Purchase","Sell","Deposite","Withdrawal"],validators = [DataRequired()])
+    value_l = DecimalField('Amount Lower Bound')
+    value_h = DecimalField('Amount Upper Bound')
+    date_l = DateField('Date Earliest', format='%m/%d/%Y')
+    date_h = DateField('Date Latest', format='%m/%d/%Y')
+    submit = SubmitField('Apply Filters')
+
+@bp.route('/info/balance_hist/filter', methods=['GET','POST'])
+def filter_balance():
+    form = FilterBalForm()
+    if form.validate_on_submit():
+        if User.filter_bal(current_user.id, form.category.data,form.value_l.data, form.value_h.data,form.date_l.data,form.date_h.data):
+            result = User.filter_bal(current_user.id, form.category.data, form.value_l.data, form.value_h.data,form.date_l.data,form.date_h.data)
+            return render_template('search_balance_result.html', result = result)
+
+
 @bp.route('/history', methods=['GET','POST'])
 def history():
     if current_user.is_authenticated:
@@ -230,6 +255,9 @@ class SearchForm_hist(FlaskForm):
     date_l = DateField('Date Earliest', format='%m/%d/%Y')
     date_h = DateField('Date Latest', format='%m/%d/%Y')    
     submit = SubmitField('Search')
+
+
+
 
 @bp.route("/history/search", methods=['GET','POST'])
 def search():
@@ -291,6 +319,9 @@ def view_seller(uid = None):
         feedback = User.get_seller_feedback(uid)
         return render_template("view_seller.html", seller_info = seller_info, feedback = feedback)
     return None
+
+
+
 
 @bp.route('/history/addinventory', methods=['GET','POST'])
 def addinventory():
