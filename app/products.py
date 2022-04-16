@@ -20,46 +20,7 @@ class ProductForm(FlaskForm):
     image = StringField(_l('Product Image'), validators=[DataRequired()])
     submit = SubmitField(_l('Add Product'))
 
-@bp.route('/ProductPages/<productID>')
-def product_page(productID):
-    
-    user_creator = False
-    product = Product.get(productID)
-    #user = User.get(product.creator_id)
-    #sellers = Seller.get_seller_by_pid(productID)
-    #sellerNames = []
-    if current_user.is_authenticated:
-        user_seller = User.is_seller(current_user.id)
-    else:
-        user_seller = False
-
-    if current_user.is_authenticated:
-        if user.id == current_user.id:
-            user_creator = True
-
-    # for idx in range(len(sellers)):
-    #     seller = sellers[idx]
-    #     sellerNames.append([0,0])
-    #     sellerNames[idx][0] = User.get(seller.seller_id)
-    #     sellerNames[idx][1] = seller.quantity
-    #     print(sellerNames[idx])
-
-    #reviews = Product.ratings(product.pid)
-
-    #num_ratings = len(reviews)
-    #average_rating = sum(int(review[0]) for review in reviews) / (num_ratings if num_ratings else 1)
-
-    return render_template('productPage.html',
-                            #product=product,
-                            #user=user,
-                            #sellerNames=sellerNames,
-                            #reviews=reviews,
-                            #num_ratings=num_ratings,
-                            #average_rating=average_rating,
-                            #user_seller=user_seller,
-                            #user_creator=user_creator)
-
-
+# unfinished
 @bp.route('/createProduct', methods=['GET', 'POST'])
 def createProduct():
     form = ProductForm()
@@ -73,6 +34,7 @@ def createProduct():
                 #current_user.id
             ):
                 flash('Product added successfully!')       
-                return redirect(url_for('index.index')) ####### check if the parameter is correct
+                return redirect(url_for('index.index'))
 
     return render_template('createProduct.html', form=form)
+    # no createProduct.html yet

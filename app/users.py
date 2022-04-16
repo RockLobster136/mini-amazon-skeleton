@@ -631,7 +631,7 @@ def view_prod(pid =None):
                     review_status = "can review"
             else: # not purchased
                 review_status = "cannot review"
-        return render_template("view_prod.html",prod_info = prod_info,pid = pid, review_status = review_status )
+        return render_template("view_prod.html",prod_info = prod_info,pid = pid, review_status = review_status ,inventory = inventory)
     return render_template("view_prod.html")
 
 @bp.route('/redirect_to')

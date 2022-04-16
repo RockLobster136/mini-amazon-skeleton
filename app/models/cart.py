@@ -24,32 +24,32 @@ class Cart:
             ''',
             uid = buyer_id
         )
-        return [Cart(*rows) for row in rows]
+        return [Cart(*row) for row in rows]
     
     #
     @staticmethod
     def add_to_cart(buyer_id, inventory_id, quantity, product_id):
-        rows = app.db.execute(f'''SELECT quantity FROM Carts WHERE inventory_id={inventory_id} AND buyer_id={buyer_id};''')
+        rows = app.db.execute(f'''SELECT quantity FROM Carts WHERE iid={inventory_id} AND uid={buyer_id};''')
         if rows is None or len(rows) == 0:
-            query = f'''INSERT INTO Carts(id, product_id, buyer_id, inventory_id, quantity,save_for_later)
-                    VALUES (COALESCE((SELECT MAX(id)+1 FROM Carts),0), {product_id}, {buyer_id}, {inventory_id}, {quantity},FALSE);'''
+            query = f'''INSERT INTO Carts(id, uid, iid, quantity,save_for_later)
+                    VALUES (COALESCE((SELECT MAX(id)+1 FROM Carts),0),{buyer_id}, {inventory_id}, {quantity},FALSE);'''
         else:
             query = f'''UPDATE Carts
                         SET quantity = {int(rows[0][0]) + int(quantity)}
-                        WHERE inventory_id={inventory_id} AND buyer_id={buyer_id};'''
+                        WHERE iid={inventory_id} AND uid={buyer_id};'''
         rows = app.db.execute(query)
         return rows
     
     @staticmethod
     def remove_from_cart(buyer_id, inventory_id):
-        rows = app.db.execute(f'''DELETE FROM Carts WHERE inventory_id={inventory_id} AND buyer_id={buyer_id};''')
+        rows = app.db.execute(f'''DELETE FROM Carts WHERE iid={inventory_id} AND uid={buyer_id};''')
         return rows
 
     @staticmethod
     def change_quantity(buyer_id, inventory_id, quantity):
         rows = app.db.execute('''UPDATE Carts 
                                  SET quantity = :quantity 
-                                 WHERE inventory_id=:inventory_id AND buyer_id=:buyer_id;''',
+                                 WHERE iid=:inventory_id AND uid=:buyer_id;''',
                               buyer_id=buyer_id, inventory_id=inventory_id, quantity=quantity)
         return rows
     
@@ -111,5 +111,5 @@ class Cart:
         ## update seller balance
 
         # delete cart record
-        rows = app.db.execute(f'''DELETE FROM Carts WHERE buyer_id={buyer_id};''')
+        rows = app.db.execute(f'''DELETE FROM Carts WHERE uid={buyer_id};''')
         return rows

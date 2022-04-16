@@ -54,7 +54,7 @@ This is the product page for  {{pid}}
                         <form action="{{ url_for('cart.cart') }}" method="post">
                             <input type="hidden" name="action" value="add"/>
                             <input type="hidden" name="inventory_id" value="{{ i.id }}"/>
-                            <input type="hidden" name="product_id" value="{{ product.id }}"/>
+                            <input type="hidden" name="product_id" value="{{ prod_info.id }}"/>
                             <label for="quantity">Quantity:</label>
                             <input type="number" id="quantity" name="quantity" min="1" max="{{ i.quantity }}" value="1">
                             <input type="submit" value="Add to Cart">
