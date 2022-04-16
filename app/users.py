@@ -318,7 +318,7 @@ def update_inventory(iid = None):
     form = InventoryForm()
     if form.validate_on_submit:
         if iid:
-            if form.Delete.data == "Yes":
+            if form.delete.data == "Yes":
                 if Inventory.delete_inventory(iid):
                     flash("Successfully delete this Inventory")
                     return render_template("update.html",form = form)
@@ -435,10 +435,13 @@ def seller_insight():
                 current_user.id, datetime.datetime(1980, 9, 14, 0, 0, 0))
     prodnames = [p.prodname for p in prods]
     form.prdoname.choices = prodnames
+    rating_summary = SellerFeedback.seller_feedback_summary(current_user.id)
+    num_seller = User.get_num_sellers()
+    rank_per = round(rating_summary[2]/num_seller[0][0],4)*100
     if form.validate_on_submit():
         name = form.prdoname.data.replace(" ", "-")
-        return render_template('insights.html',form = form,name = name)
-    return render_template('insights.html',form = form)
+        return render_template('insights.html',form = form,name = name,rating_summary = rating_summary,rank = rank_per)
+    return render_template('insights.html',form = form,rating_summary=rating_summary,rank = rank_per)
 
 @bp.route("/insights/<prodname>", methods=['GET','POST'])
 def prod_viz(prodname = None):

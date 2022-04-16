@@ -273,9 +273,10 @@ class SellerFeedback:
     @staticmethod
     def seller_feedback_summary(sid):
         rows = app.db.execute('''
-        SELECT avg_rating, rank
-        (SELECT sid, avg_rating, RANK() OVER (ORDER BY avg_rating) AS rank
-        FROM (SELECT sid, AVG(rating) AS avg_rating
+        SELECT ROUND(avg_rating,3), cnt,rank
+        FROM
+        (SELECT sid,cnt, avg_rating,RANK() OVER (ORDER BY avg_rating) AS rank
+        FROM (SELECT sid, AVG(rating) AS avg_rating, COUNT(1) AS cnt
         FROM SellerFeedback
         GROUP BY sid) AS t1) AS t2
         WHERE sid = :sid
