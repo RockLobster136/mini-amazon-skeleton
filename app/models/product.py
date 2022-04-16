@@ -18,9 +18,11 @@ class Product:
     @staticmethod
     def get(id):
         rows = app.db.execute('''
-SELECT id,name,category,description,price,image,available,creator_id
+SELECT Products.id,Products.name,Categories.name,description,price,image,available,creator_id
 FROM Products
-WHERE id = :id
+INNER JOIN Categories
+ON Products.category = Categories.id
+WHERE Products.id = :id
 ''',
                               id=id)
         return Product(*(rows[0])) if rows is not None else None
