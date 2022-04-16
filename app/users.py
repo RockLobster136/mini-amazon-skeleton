@@ -23,6 +23,9 @@ class LoginForm(FlaskForm):
     submit = SubmitField('Sign In')
 
 
+
+
+
 @bp.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
@@ -205,6 +208,9 @@ def view_balance():
     else:
         return redirect(url_for('users.info'))
 
+
+
+
 class FilterBalForm(FlaskForm):
     category = SelectField('Transaction Category', choices = ["Purchase","Sell","Deposite","Withdrawal"],validators = [DataRequired()])
     value_l = DecimalField('Amount Lower Bound')
@@ -220,6 +226,19 @@ def filter_balance():
         if User.filter_bal(current_user.id, form.category.data,form.value_l.data, form.value_h.data,form.date_l.data,form.date_h.data):
             result = User.filter_bal(current_user.id, form.category.data, form.value_l.data, form.value_h.data,form.date_l.data,form.date_h.data)
             return render_template('search_balance_result.html', result = result)
+        else:
+            flash("Invalid filter. Please try again!")
+            return render_template('search_balance.html', form = form)
+    else:
+        if not form.value_l.data:
+            form.value_l.data = 0
+        if not form.value_h.data:
+            form.value_h.data = 9999999999999999
+        if not form.date_l.data:
+            form.date_l.data = datetime.datetime(1980, 9, 14, 0, 0, 0)
+        if not form.date_h.data:
+            form.date_h.data = datetime.datetime.now()
+        return render_template('search_balance.html', form = form)
 
 
 @bp.route('/history', methods=['GET','POST'])
