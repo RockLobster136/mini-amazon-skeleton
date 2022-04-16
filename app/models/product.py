@@ -190,7 +190,8 @@ GROUP BY pid)
 SELECT pro.id as id, ca.name as ca_name, pro.name as name, ac.min_price as price, ac.cnt as avail, r.rating as rating, pro.description as des, pro.image as img
 FROM Products pro JOIN avail_cnt ac ON pro.id = ac.pid JOIN ratings r ON r.pid = pro.id JOIN cat_temp ca ON ca.id = pro.category
 WHERE
-ac.min_price >= :price_l
+pro.name LIKE {product_n}
+AND ac.min_price >= :price_l
 AND ac.min_price <= :price_h
 AND r.rating >= :rating_l
 AND r.rating <= :rating_h
