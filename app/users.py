@@ -647,14 +647,12 @@ def redirect_to():
 class SearchForm_prod(FlaskForm):
     name = StringField('Product Name', validators=[DataRequired()])
     sort_by = SelectField('Sort By', choices = ["price","availability"], validators = [DataRequired()])
-    firstname = StringField('Seller First Name')
-    lastname = StringField('Seller Last Name')
     des = StringField('Product Description')
     cat = SelectField('Filter by Product Category', choices = [])
-    price_l = DecimalField('Product Price Lower Bound')
-    price_h = DecimalField('Product Price Upper Bound')
-    rating_l = DecimalField('Product Rating Lower Bound', validators = [NumberRange(min=1, max=10, message = 'Enter a number between 1 to 10')])
-    rating_h = DecimalField('Product Rating Upper Bound', validators = [NumberRange(min=1, max=10, message = 'Enter a number between 1 to 10')])
+    price_l = DecimalField('Minimum Price Lower Bound')
+    price_h = DecimalField('Minimum Price Upper Bound')
+    rating_l = DecimalField('Average Rating Lower Bound', validators = [NumberRange(min=1, max=10, message = 'Enter a number between 1 to 10')])
+    rating_h = DecimalField('Average Rating Upper Bound', validators = [NumberRange(min=1, max=10, message = 'Enter a number between 1 to 10')])
     avail = DecimalField('Minimum Number of Product Available')
     submit = SubmitField('Search')
 
@@ -663,19 +661,13 @@ def searchProduct():
     form = SearchForm_prod()
     form.cat.choices = ["All"] + Product.get_prod_cat()
     if form.validate_on_submit():
-        if Product.search_prod(form.name.data.lower(), form.sort_by.data, form.firstname.data.lower(), form.lastname.data.lower(), form.des.data.lower(),
-        form.cat.data, form.price_l.data, form.price_h.data, form.rating_l.data, form.rating_h.data, form.avail.data):
-            result = Product.search_prod(form.name.data.lower(), form.sort_by.data, form.firstname.data.lower(), form.lastname.data.lower(), form.des.data.lower(),
-            form.cat.data, form.price_l.data, form.price_h.data, form.rating_l.data, form.rating_h.data, form.avail.data)
+        if Product.search_prod(form.name.data.lower(), form.sort_by.data, form.des.data.lower(), form.cat.data, form.price_l.data, form.price_h.data, form.rating_l.data, form.rating_h.data, form.avail.data):
+            result = Product.search_prod(form.name.data.lower(), form.sort_by.data, form.des.data.lower(), form.cat.data, form.price_l.data, form.price_h.data, form.rating_l.data, form.rating_h.data, form.avail.data)
             return render_template('search_prod_result.html', result = result)
         else:
-            flash("We need more information for find the person you want. Please try again.")
+            flash("Product does not exist")
             return render_template('search_prod.html', form = form)
     else:
-        if not form.firstname.data:
-            form.firstname.data = "optional"
-        if not form.lastname.data:
-            form.lastname.data = "optional"
         if not form.des.data:
             form.des.data = "optional"
         if not form.cat.data:

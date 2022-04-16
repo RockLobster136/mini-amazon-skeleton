@@ -15,11 +15,9 @@
       <th scope="col">Category</th>
       <th scope="col">Description</th>
       <th scope="col">Image</th>
-      <th scope="col">Price</th>
+      <th scope="col">Lowest Price Available</th>
       <th scope="col">Availability</th>
-      <th scope="col">Rating</th>
-      <th scope="col">Seller First Name</th>
-      <th scope="col">Seller Last Name</th>
+      <th scope="col">Average Rating</th>
     </tr>
   </thead>
   <tbody>
@@ -32,10 +30,8 @@
         <td>{{res.img}}</td>
         <td>{{res.price}}</td>
         <td>{{res.avail}}</td>
-        <td>{{res.rating}}</td>
-        <td>{{res.firstname}}</td>
-        <td>{{res.lastname}}</td>
-      </tr>
+	<td>{{res.rating}}</td>
+      <tr>
     {% endfor %}
   </tbody>
 </table>

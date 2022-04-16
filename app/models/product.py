@@ -145,8 +145,9 @@ SELECT *
 FROM Categories
 ''')    
         return [row[1] for row in rows]
+
     @staticmethod
-    def search_prod(prod_name, sort_by, sell_fn, sell_ln, des, cat, price_l, price_h, rating_l, rating_h, avail):
+    def search_prod(prod_name, sort_by, des, cat, price_l, price_h, rating_l, rating_h, avail):
         product_n = f"""'%{prod_name}%'"""
         if cat != "All":
             cate = f"""{cat}"""
@@ -155,9 +156,9 @@ FROM Categories
             cate = f""" """
             cate_switch = f"""--"""
         if sort_by == "price":
-            product_sort = f"""iu.{sort_by}"""
+            product_sort = f"""ac.min_price"""
         else:
-            product_sort = f"""iu.quantity DESC"""
+            product_sort = f"""ac.cnt DESC"""
         product_des = f"""'%{des}%'"""
         if des != "optional":
             switch_des = " "
@@ -170,90 +171,36 @@ FROM Categories
         else:
             switch_des = f"""--"""
             des_match = f""" """
-        if (sell_fn != "optional" and sell_ln == "optional") or (sell_fn == "optional" and sell_ln != "optional"):
-            if sell_fn == "optional" and sell_ln != "optional":
-                name_field = f"""iu.l_na"""
-                temp = f"""'%{sell_ln}%'"""
-            if sell_fn != "optional" and sell_ln == "optional":
-                name_field = f"""iu.f_na"""
-                temp = f"""'%{sell_fn}%'"""
-            rows = app.db.execute(f"""
+        rows = app.db.execute(f"""
 WITH
-inv_users(pid, price, quantity, f_na, l_na) as
-(SELECT pid, price, quantity, U.firstname as f_na, U.lastname as l_na
-FROM Inventory I JOIN Users U ON I.sid = U.id),
 ratings(pid, rating) as
-(SELECT pid, rating
-FROM ProductFeedback),
+(SELECT pid, avg(rating)
+FROM ProductFeedback
+GROUP BY pid),
 cat_temp(id, name) as
 (SELECT id, name
 FROM Categories
 {cate_switch} WHERE name = {cate}
 ),
-avail_cnt(pid, cnt) as
-(SELECT pid, count(*)
+avail_cnt(pid, min_price, cnt) as
+(SELECT pid, min(price),count(*)
 FROM Inventory
 GROUP BY pid)
 
-SELECT pro.id as id, ca.name as ca_name, pro.name as name, iu.price as pirce, iu.quantity as avail,
-iu.f_na as firstname, iu.l_na as lastname, r.rating as rating, pro.description as des, pro.image as img
-FROM Products pro JOIN avail_cnt ac ON pro.id = ac.pid JOIN inv_users iu ON pro.id = iu.pid JOIN ratings r ON r.pid = pro.id JOIN cat_temp ca ON ca.id = pro.category
-WHERE LOWER(pro.name) LIKE {product_n}
-AND LOWER({name_field}) LIKE {temp}
-{switch_des} AND LOWER(pro.description) LIKE {des_match}
-{cate_switch} AND pro.category = {cate}
-AND iu.price >= :price_l
-AND iu.price <= :price_h
+SELECT pro.id as id, ca.name as ca_name, pro.name as name, ac.min_price as price, ac.cnt as avail, r.rating as rating, pro.description as des, pro.image as img
+FROM Products pro JOIN avail_cnt ac ON pro.id = ac.pid JOIN ratings r ON r.pid = pro.id JOIN cat_temp ca ON ca.id = pro.category
+WHERE
+ac.min_price >= :price_l
+AND ac.min_price <= :price_h
 AND r.rating >= :rating_l
 AND r.rating <= :rating_h
 AND ac.cnt >= :avail
+{switch_des} AND LOWER(pro.description) LIKE {des_match}
+{cate_switch} AND pro.category = {cate}
 ORDER BY {product_sort}, id""",
             price_l = price_l,
             price_h = price_h,
             rating_l = rating_l,
             rating_h = rating_h,
             avail = avail)
-            return rows
-
-        if sell_fn != "optional" and sell_ln != "optional":
-            temp_fn = f"""'%{sell_fn}%'"""
-            temp_ln = f"""'%{sell_ln}%'"""
-            rows = app.db.execute(f"""
-WITH
-inv_users(pid, price, quantity, f_na, l_na) as
-(SELECT pid, price, quantity, U.firstname as f_na, U.lastname as l_na
-FROM Inventory I JOIN Users U ON I.sid = U.id),
-ratings(pid, rating) as
-(SELECT pid, rating
-FROM ProductFeedback),
-cat_temp(id, name) as
-(SELECT id, name
-FROM Categories
-{cate_switch} WHERE name = {cate}
-),
-avail_cnt(pid, cnt) as
-(SELECT pid, count(*)
-FROM Inventory
-GROUP BY pid)
-
-SELECT pro.id as id, pro.name as name, iu.price as pirce, iu.quantity as avail,
-iu.f_na as firstname, iu.l_na as lastname, r.rating as rating, pro.description as des, pro.image as img
-FROM Products pro JOIN avail_cnt ac ON pro.id = ac.pid JOIN inv_users iu ON pro.id = iu.pid JOIN ratings r ON r.pid = pro.id
-WHERE LOWER(pro.name) LIKE {product_n}
-AND LOWER(iu.f_na) LIKE {temp_fn}
-AND LOWER(iu.l_na) LIKE {temp_ln}
-{switch_des} AND LOWER(pro.description) LIKE {des_match}
-{cate_switch} AND pro.category = {cate}
-AND iu.price >= :price_l
-AND iu.price <= :price_h
-AND r.rating >= :rating_l
-AND r.rating <= :rating_h
-AND ac.cnt >= :avail
-ORDER BY {product_sort}, id""",
-            price_l = price_l,
-            price_h = price_h,
-            rating_l = rating_l,
-            rating_h = rating_h,
-            avail = avail)
-            return rows
-        return None
+        return rows
