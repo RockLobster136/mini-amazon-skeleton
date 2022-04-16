@@ -3,13 +3,14 @@ from werkzeug.security import generate_password_hash
 import csv
 from faker import Faker
 import random
-
+from datetime import datetime
+import time
 
 num_users = 100
-num_products = 2000
-num_purchases = 2500
+num_products = 500
+num_purchases = 5000
 num_categories = 20
-num_inventories = 5000
+num_inventories = 2000
 num_ProductFeedback = 2000
 num_SellerFeedback = 200
 Faker.seed(516)
@@ -102,12 +103,13 @@ def gen_purchases(num_purchases, available_pids,available_sellers):
             uid = fake.random_int(min=0, max=num_users-1)
             pid = fake.random_element(elements=available_pids)
             sid = fake.random_element(elements = available_sellers)
-            time_purchased = fake.date_time()
+            time_purchased = fake.date_between_dates(date_start=datetime(2022,1,1), date_end=datetime(2022,4,15))
+            hex_time = hex(int(time.mktime(time_purchased.timetuple())))[2:]
             quantity = fake.random_int(min = 1,max = 100)
             price = fake.random_int(min = 1,max = 10000)
-            order_id = fake.random_int(min = 1, max = num_purchases//3)
+            order_id =  int(hex_time+str(uid),16)
             order_status = 0
-            fulfill_date = fake.date_time()
+            fulfill_date = fake.date_between_dates(date_start=datetime(2022,1,1), date_end=datetime(2022,4,15))
             writer.writerow([id, uid, pid,sid, time_purchased,quantity,price,order_id,order_status,fulfill_date])
             purchaseId.append(id)
         print(f'{num_purchases} generated')
@@ -122,7 +124,7 @@ def gen_inventory(available_sellers,num_inventories):
                 print(f'{id}', end=' ', flush=True)
             pid = fake.random_element(elements=available_pids)
             sid = fake.random_element(elements = available_sellers)
-            release_date = fake.date_time()
+            release_date = fake.date_between_dates(date_start=datetime(2022,1,1), date_end=datetime(2022,4,15))
             quantity = fake.random_int(min = 1,max = 100)
             price = fake.random_int(min = 1,max = 10000)
             writer.writerow([id, sid, pid, quantity,price,release_date])
@@ -140,7 +142,7 @@ def gen_ProductFeedback(num_ProductFeedback, available_products, available_buyer
             pid = fake.random_element(elements=available_products)
             rating = fake.random_int(min = 1,max = 10)
             review = fake.sentence(nb_words=50)
-            time_feedback = fake.date_time()
+            time_feedback = fake.date_between_dates(date_start=datetime(2022,1,1), date_end=datetime(2022,4,15))
             upvotes = fake.random_int(min = 1,max = 50)
             writer.writerow([id, uid, pid, rating, review, time_feedback, upvotes])
         print(f'{num_inventories} generated')
@@ -157,7 +159,7 @@ def gen_SellerFeedback(num_SellerFeedback, available_sellers, available_buyers):
             sid = fake.random_element(elements=available_sellers)
             rating = fake.random_int(min = 1,max = 10)
             review = fake.sentence(nb_words=50)
-            time_feedback = fake.date_time()
+            time_feedback = fake.date_between_dates(date_start=datetime(2022,1,1), date_end=datetime(2022,4,15))
             upvotes = fake.random_int(min = 1,max = 50)
             writer.writerow([id, uid, sid, rating, review, time_feedback, upvotes])
         print(f'{num_inventories} generated')
