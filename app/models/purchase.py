@@ -235,6 +235,24 @@ ORDER BY time_purchased DESC ,order_id
                               prodname = prodname
                               )
         return [Purchase(*row) for row in rows]
+    @staticmethod
+    def top_prod(sid):
+        rows = app.db.execute('''
+        SELECT *
+        FROM(
+        SELECT Products.name,COUNT(DISTINCT uid),SUM(quantity) AS total_cnt
+        FROM Purchases
+        INNER JOIN Products
+        ON Purchases.pid = Products.id
+        WHERE sid = :sid
+        GROUP BY Products.name
+        )t1
+        ORDER BY total_cnt DESC
+        limit 5
+''',
+                              sid=sid
+                              )
+        return rows
     
 
 
