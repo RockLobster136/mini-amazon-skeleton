@@ -579,16 +579,16 @@ def add_feedback_productpage():
 def view_prod(pid =None):
     print(pid)
     if pid:
+        prod_info = Product.get(pid)
         if current_user.is_authenticated:
             if ProductFeedback.check_purchase_product(current_user.id, pid): # purchased
                 feedback_id = ProductFeedback.find_product_feedbackid(current_user.id, pid)
                 if feedback_id: # reviewed
                     review_status = "can update"
-                    return render_template("view_prod.html",pid = pid, feedback_id = feedback_id, review_status = review_status ) # pass in fid
+                    return render_template("view_prod.html",prod_info = prod_info,pid = pid, feedback_id = feedback_id, review_status = review_status ) # pass in fid
                 else: # not reviewed
                     review_status = "can review"
             else: # not purchased
                 review_status = "cannot review"
-        return render_template("view_prod.html",pid = pid, review_status = review_status )
-    print(pid)
+        return render_template("view_prod.html",prod_info = prod_info,pid = pid, review_status = review_status )
     return render_template("view_prod.html")
