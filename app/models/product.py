@@ -189,11 +189,15 @@ cat_temp(id, name) as
 (SELECT id, name
 FROM Categories
 {cate_switch} WHERE name = {cate}
-)
+),
+avail_cnt(pid, cnt) as
+(SELECT pid, count(*)
+FROM Inventory
+GROUP BY pid)
 
 SELECT pro.id as id, ca.name as ca_name, pro.name as name, iu.price as pirce, iu.quantity as avail,
 iu.f_na as firstname, iu.l_na as lastname, r.rating as rating, pro.description as des, pro.image as img
-FROM Products pro JOIN inv_users iu ON pro.id = iu.pid JOIN ratings r ON r.pid = pro.id JOIN cat_temp ca ON ca.id = pro.category
+FROM Products pro JOIN avail_cnt ac ON pro.id = ac.pid JOIN inv_users iu ON pro.id = iu.pid JOIN ratings r ON r.pid = pro.id JOIN cat_temp ca ON ca.id = pro.category
 WHERE LOWER(pro.name) LIKE {product_n}
 AND LOWER({name_field}) LIKE {temp}
 {switch_des} AND LOWER(pro.description) LIKE {des_match}
@@ -202,8 +206,7 @@ AND iu.price >= :price_l
 AND iu.price <= :price_h
 AND r.rating >= :rating_l
 AND r.rating <= :rating_h
-GROUP BY pro.id, ca.name
-HAVING iu.quantity >= :avail
+AND ac.cnt >= :avail
 ORDER BY {product_sort}, id""",
             price_l = price_l,
             price_h = price_h,
@@ -227,11 +230,15 @@ cat_temp(id, name) as
 (SELECT id, name
 FROM Categories
 {cate_switch} WHERE name = {cate}
-)
+),
+avail_cnt(pid, cnt) as
+(SELECT pid, count(*)
+FROM Inventory
+GROUP BY pid)
 
 SELECT pro.id as id, pro.name as name, iu.price as pirce, iu.quantity as avail,
 iu.f_na as firstname, iu.l_na as lastname, r.rating as rating, pro.description as des, pro.image as img
-FROM Products pro JOIN inv_users iu ON pro.id = iu.pid JOIN ratings r ON r.pid = pro.id
+FROM Products pro JOIN avail_cnt ac ON pro.id = ac.pid JOIN inv_users iu ON pro.id = iu.pid JOIN ratings r ON r.pid = pro.id
 WHERE LOWER(pro.name) LIKE {product_n}
 AND LOWER(iu.f_na) LIKE {temp_fn}
 AND LOWER(iu.l_na) LIKE {temp_ln}
@@ -241,8 +248,7 @@ AND iu.price >= :price_l
 AND iu.price <= :price_h
 AND r.rating >= :rating_l
 AND r.rating <= :rating_h
-GROUP BY pro.id, ca.name
-HAVING iu.quantity >= :avail
+AND ac.cnt >= :avail
 ORDER BY {product_sort}, id""",
             price_l = price_l,
             price_h = price_h,
