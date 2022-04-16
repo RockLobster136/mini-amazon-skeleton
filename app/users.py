@@ -618,6 +618,7 @@ def add_feedback_productpage():
 @bp.route('/view_prod/<pid>', methods=['GET','POST'])
 def view_prod(pid =None):
     print(pid)
+    inventory = Inventory.get_sellers_for_product(int(pid))
     if pid:
         prod_info = Product.get(pid)
         if current_user.is_authenticated:

@@ -13,7 +13,6 @@ bp = Blueprint('index', __name__)
 
 @bp.route('/')
 def index():
-    inventory = Inventory.get_all_sellers_for_product(int(pid))
     # get all available products for sale:
     products = ProductFeedback.summary_rating(True)
     return render_template('index.html',
