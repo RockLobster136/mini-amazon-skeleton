@@ -25,7 +25,9 @@ ON Products.category = Categories.id
 WHERE Products.id = :id
 ''',
                               id=id)
-        return Product(*(rows[0])) if rows is not None else None
+        if rows:
+            return Product(*(rows[0])) 
+        else: return None
 
     # get all products (available)
     @staticmethod

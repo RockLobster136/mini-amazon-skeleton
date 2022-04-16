@@ -68,7 +68,7 @@ FROM Purchases Pur
 INNER JOIN Products Pro
 ON Pur.pid = Pro.id
 INNER JOIN Users U
-ON Pur.sid = U.id
+ON Pur.uid = U.id
 WHERE sid = :sid
 AND time_purchased >= :since
 ORDER BY time_purchased DESC ,order_id

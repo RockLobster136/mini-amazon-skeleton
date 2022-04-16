@@ -14,10 +14,10 @@
         <th scope="col">Order ID</th>
         <th scope="col">Item Fulfillment</th>
         <th scope="col">Order Fulfillment</th>
-        <th scope="col">Buyer's Address</th>
         <th scope="col">price</th>
         <th scope="col">quantity</th>
         <th scope="col">Product Name</th>
+        <th scope="col">Shipping Address</th>
         <th scope="col">Time</th>
         <th scope="col">Action</th>
       </tr>
@@ -28,10 +28,10 @@
           <th scope="row">{{purchase.order_id}}</th>
           <td>{{purchase.order_status}}</td>
           <td>{{purchase.batch_status}}</td>
-          <td>{{purchase.address}}</td>
           <td>{{purchase.price}}</td>
           <td>{{purchase.quantity}}</td>
           <td>{{purchase.prodname}}</td>
+          <td>{{purchase.address}}</td>
           <td>{{purchase.time_purchased}}</td>
           {% if not purchase.batch_status%}
           <td> <a class="btn btn-secondary" 
