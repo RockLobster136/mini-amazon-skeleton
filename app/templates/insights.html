@@ -5,6 +5,26 @@
 <br>
 <h3> Search Low Inventory </h3>
 <a class="btn btn-secondary" href="{{ url_for('users.low_inventory') }}" role="button">Search</a>
+<h3>Your Top Products </h3>
+<table class='table table-hover table-bordered container'>
+  <thead class="thead-dark">
+    <tr>
+      <th scope="col">Product Name</th>
+      <th scope="col">Number of buyers</th>
+      <th scope="col">Total Quantity Sold</th>
+
+    </tr>
+  </thead>
+  <tbody>
+    {% for p in top_prods %}
+      <tr>
+        <th scope="row">{{p[0]}}</th>
+        <th scope="row">{{p[1]}}</th>
+        <th scope="row">{{p[2]}}</th>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
 <h3>Order Popularity Trend </h3>
 <form action="" method="post" novalidate>
     {{ form.hidden_tag() }}
