@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h3></h3>
+<a class="btn btn-secondary" href="{{ url_for('index.index') }}" role="button">Return</a>
+<a class="btn btn-secondary" href="{{ url_for('users.searchProduct') }}" role="button">Return To Search</a>
+<br><br>
+
+<table class='table table-hover table-bordered container'>
+  <thead class="thead-dark">
+    <tr>
+      <th scope="col">ID</th>
+      <th scope="col">Name</th>
+      <th scope="col">Category</th>
+      <th scope="col">Description</th>
+      <th scope="col">Image</th>
+      <th scope="col">Price</th>
+      <th scope="col">Availability</th>
+      <th scope="col">Rating</th>
+      <th scope="col">Seller First Name</th>
+      <th scope="col">Seller Last Name</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for res in result%}
+      <tr>
+	<th scope="row">{{res.id}}</th>
+        <td>{{res.name}}</td>
+        <td>{{res.ca_name}}</td>
+        <td>{{res.des}}</td>
+        <td>{{res.img}}</td>
+        <td>{{res.price}}</td>
+        <td>{{res.avail}}</td>
+        <td>{{res.rating}}</td>
+        <td>{{res.firstname}}</td>
+        <td>{{res.lastname}}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% endblock %}

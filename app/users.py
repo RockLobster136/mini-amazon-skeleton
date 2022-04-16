@@ -667,7 +667,7 @@ def searchProduct():
         form.cat.data, form.price_l.data, form.price_h.data, form.rating_l.data, form.rating_h.data, form.avail.data):
             result = Product.search_prod(form.name.data.lower(), form.sort_by.data, form.firstname.data.lower(), form.search_lastname.data.lower(), form.des.data.lower(),
             form.cat.data, form.price_l.data, form.price_h.data, form.rating_l.data, form.rating_h.data, form.avail.data)
-            return render_template('find_user_result.html', result = result)
+            return render_template('search_prod_result.html', result = result)
         else:
             flash("We need more information for find the person you want. Please try again.")
             return render_template('search_prod.html', form = form)
