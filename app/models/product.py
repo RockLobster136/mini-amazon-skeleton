@@ -174,7 +174,7 @@ FROM Categories
         rows = app.db.execute(f"""
 WITH
 ratings(pid, rating) as
-(SELECT pid, avg(rating)
+(SELECT pid, round(avg(rating),2)
 FROM ProductFeedback
 GROUP BY pid),
 cat_temp(id, name) as
