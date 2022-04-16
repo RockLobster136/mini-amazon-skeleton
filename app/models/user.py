@@ -197,7 +197,7 @@ ORDER BY Pur.time_purchased DESC"""
             switch = f""" """
         else:
             switch = f"""--"""
-        if firstname != "optional" or lastname != "optional":
+        if (firstname != "optional" and lastname == "optional") or (firstname == "optional" and lastname != "optional"):
             if firstname == "optional" and lastname != "optional":
                 lower = lastname.lower()
                 name_field = f"""lastname"""
@@ -209,20 +209,20 @@ ORDER BY Pur.time_purchased DESC"""
 SELECT id, firstname, lastname, isseller
 FROM Users
 WHERE LOWER({name_field}) LIKE {temp}
-{switch} AND isSeller = {r}
+{switch} AND isseller = {r}
 ORDER BY id""")
             return rows
         if firstname != "optional" and lastname != "optional":
-            lower = firstname.lower()
-            temp = f"""'%{lower}%'"""
-            lower_2 = lastname.lower()
-            temp_2 = f"""'%{lower_2}%'"""
+            f_name = firstname.lower()
+            l_name = lastname.lower()
+            temp_fn = f"""'%{f_name}%'"""
+            temp_ln = f"""'%{l_name}%'"""
             rows = app.db.execute(f"""
 SELECT id, firstname, lastname, isseller
 FROM Users
-WHERE LOWER(firstname) LIKE {temp}
-AND LOWER(lastname) LIKE {temp_2}
-{switch} AND isSeller = {r}
+WHERE LOWER(firstname) LIKE {temp_fn}
+AND LOWER(lastname) LIKE {temp_ln}
+{switch} AND isseller = {r}
 ORDER BY id""")
             return rows
         return None
