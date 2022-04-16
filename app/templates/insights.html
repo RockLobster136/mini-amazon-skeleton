@@ -26,5 +26,14 @@
     </p>
     <a class="btn btn-secondary" href="{{ url_for('users.prod_viz',prodname = name) }}" role="button">Go</a>
   </form>
-
+  <h3> Your Ratings </h3> <br>
+  Your are reviewed by {{rating_summary[1]}} users 
+  <br>Your average rating is {{rating_summary[0]}}
+  <br> In terms of average rating, You ranked {{rating_summary[2]}} among all the sellers(top {{ rank}}%)
+  <br>
+  {% if rank < 10 %}
+  <h3>Congratulations!</h3>
+  {% endif %}
+  <br>
+  <a class="btn btn-secondary" href="{{ url_for('index.index') }}" role="button">Return to Homepage</a>
 {% endblock %}

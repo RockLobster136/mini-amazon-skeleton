@@ -283,3 +283,12 @@ ORDER BY time_changed DESC """
                               d_h = d_h
                               )
         return rows
+    @staticmethod
+    def get_num_sellers():
+        rows = app.db.execute(f"""
+        SELECT COUNT(*)
+        FROM Users
+        WHERE isseller = TRUE
+ """
+ )
+        return rows
