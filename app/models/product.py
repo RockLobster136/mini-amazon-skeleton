@@ -155,9 +155,9 @@ FROM Categories
             cate = f""" """
             cate_switch = f"""--"""
         if sort_by == "price":
-            product_sort = f"""{sort_by}"""
+            product_sort = f"""iu.{sort_by}"""
         else:
-            product_sort = f"""{sort_by} DESC"""
+            product_sort = f"""iu.quantity DESC"""
         product_des = f"""'%{des}%'"""
         if des != "optional":
             switch_des = " "
@@ -169,13 +169,14 @@ FROM Categories
             des_match = des_match + f"""%{des_words[len(des_words) - 1]}%'"""
         else:
             switch_des = f"""--"""
+            des_match = f""" """
         if (sell_fn != "optional" and sell_ln == "optional") or (sell_fn == "optional" and sell_ln != "optional"):
             if sell_fn == "optional" and sell_ln != "optional":
-                name_field = f"""lastname"""
-                temp = f"""{sell_ln}"""
+                name_field = f"""iu.l_na"""
+                temp = f"""'%{sell_ln}%'"""
             if sell_fn != "optional" and sell_ln == "optional":
-                name_field = f"""firstname"""
-                temp = f"""{sell_fn}"""
+                name_field = f"""iu.f_na"""
+                temp = f"""'%{sell_fn}%'"""
             rows = app.db.execute(f"""
 WITH
 inv_users(pid, price, quantity, f_na, l_na) as
@@ -183,24 +184,25 @@ inv_users(pid, price, quantity, f_na, l_na) as
 FROM Inventory I JOIN Users U ON I.sid = U.id),
 ratings(pid, rating) as
 (SELECT pid, rating
-FROM ProductFeedback)
+FROM ProductFeedback),
 cat_temp(id, name) as
 (SELECT id, name
 FROM Categories
-{cate_switch} WHERE name = {cate})
+{cate_switch} WHERE name = {cate}
+)
 
-SELECT pro.id as id, ca.name as ca_name, pro.name as name, iu.price and pirce, iu.quantity as avail,
-iu.firstname as firstname, iu.lastname as lastname, r.rating as rating, pro.description as des, pro.image as img
+SELECT pro.id as id, ca.name as ca_name, pro.name as name, iu.price as pirce, iu.quantity as avail,
+iu.f_na as firstname, iu.l_na as lastname, r.rating as rating, pro.description as des, pro.image as img
 FROM Products pro JOIN inv_users iu ON pro.id = iu.pid JOIN ratings r ON r.pid = pro.id JOIN cat_temp ca ON ca.id = pro.category
 WHERE LOWER(pro.name) LIKE {product_n}
 AND LOWER({name_field}) LIKE {temp}
 {switch_des} AND LOWER(pro.description) LIKE {des_match}
 {cate_switch} AND pro.category = {cate}
-AND inv.price >= :price_l
-AND inv.price <= :price_h
+AND iu.price >= :price_l
+AND iu.price <= :price_h
 AND r.rating >= :rating_l
 AND r.rating <= :rating_h
-GROUP BY pro.id
+GROUP BY pro.id, ca.name
 HAVING iu.quantity >= :avail
 ORDER BY {product_sort}, id""",
             price_l = price_l,
@@ -210,7 +212,7 @@ ORDER BY {product_sort}, id""",
             avail = avail)
             return rows
 
-        if firstname != "optional" and lastname != "optional":
+        if sell_fn != "optional" and sell_ln != "optional":
             temp_fn = f"""'%{sell_fn}%'"""
             temp_ln = f"""'%{sell_ln}%'"""
             rows = app.db.execute(f"""
@@ -220,25 +222,26 @@ inv_users(pid, price, quantity, f_na, l_na) as
 FROM Inventory I JOIN Users U ON I.sid = U.id),
 ratings(pid, rating) as
 (SELECT pid, rating
-FROM ProductFeedback)
+FROM ProductFeedback),
 cat_temp(id, name) as
 (SELECT id, name
 FROM Categories
-{cate_switch} WHERE name = {cate})
+{cate_switch} WHERE name = {cate}
+)
 
-SELECT pro.id as id, pro.name as name, iu.price and pirce, iu.quantity as avail,
-iu.firstname as firstname, iu.lastname as lastname, r.rating as rating, pro.description as des, pro.image as img
+SELECT pro.id as id, pro.name as name, iu.price as pirce, iu.quantity as avail,
+iu.f_na as firstname, iu.l_na as lastname, r.rating as rating, pro.description as des, pro.image as img
 FROM Products pro JOIN inv_users iu ON pro.id = iu.pid JOIN ratings r ON r.pid = pro.id
 WHERE LOWER(pro.name) LIKE {product_n}
-AND LOWER(iu.firstname) LIKE {temp_fn}
-AND LOWER(iu.lastname) LIKE {temp_ln}
+AND LOWER(iu.f_na) LIKE {temp_fn}
+AND LOWER(iu.l_na) LIKE {temp_ln}
 {switch_des} AND LOWER(pro.description) LIKE {des_match}
 {cate_switch} AND pro.category = {cate}
-AND inv.price >= :price_l
-AND inv.price <= :price_h
+AND iu.price >= :price_l
+AND iu.price <= :price_h
 AND r.rating >= :rating_l
 AND r.rating <= :rating_h
-GROUP BY pro.id
+GROUP BY pro.id, ca.name
 HAVING iu.quantity >= :avail
 ORDER BY {product_sort}, id""",
             price_l = price_l,

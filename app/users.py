@@ -661,11 +661,11 @@ class SearchForm_prod(FlaskForm):
 @bp.route('/searchProduct', methods=['GET', 'POST'])
 def searchProduct():
     form = SearchForm_prod()
+    form.cat.choices = ["All"] + Product.get_prod_cat()
     if form.validate_on_submit():
-        form.cat.choices = ["All"] + Product.get_prod_cat()
-        if Product.search_prod(form.name.data.lower(), form.sort_by.data, form.firstname.data.lower(), form.search_lastname.data.lower(), form.des.data.lower(),
+        if Product.search_prod(form.name.data.lower(), form.sort_by.data, form.firstname.data.lower(), form.lastname.data.lower(), form.des.data.lower(),
         form.cat.data, form.price_l.data, form.price_h.data, form.rating_l.data, form.rating_h.data, form.avail.data):
-            result = Product.search_prod(form.name.data.lower(), form.sort_by.data, form.firstname.data.lower(), form.search_lastname.data.lower(), form.des.data.lower(),
+            result = Product.search_prod(form.name.data.lower(), form.sort_by.data, form.firstname.data.lower(), form.lastname.data.lower(), form.des.data.lower(),
             form.cat.data, form.price_l.data, form.price_h.data, form.rating_l.data, form.rating_h.data, form.avail.data)
             return render_template('search_prod_result.html', result = result)
         else:
