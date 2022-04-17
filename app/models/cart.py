@@ -103,8 +103,10 @@ class Cart:
         # update purchase
         timestamp = int(time.time())
         order_id = int(str(buyer_id) + str(int(time.time())))
+        amount = sum(row[3]*row[4] for row in rows)
         values = [f'({buyer_id},{row[1]},{row[5]},{row[3]},{row[4]},{order_id})' for row in rows]
-        purchase_id = app.db.execute(f'''INSERT INTO Purchases (uid,pid,sid,quantity,price,order_id) 
+        if current_user.balance - amount >= 0:
+            purchase_id = app.db.execute(f'''INSERT INTO Purchases (uid,pid,sid,quantity,price,order_id) 
                                     VALUES {",".join(values)} RETURNING id;''')[0][0]
 
         # update inventory
@@ -112,7 +114,6 @@ class Cart:
         app.db.execute(' '.join(queries))
 
         # update balance
-        amount = sum(row[3]*row[4] for row in rows)
         # update buyer
         ## update BalanceHistory
         Cart.update_balance(current_user.balance, -amount, purchase_id, buyer_id,1)

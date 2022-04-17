@@ -46,14 +46,12 @@ def cart():
                 checkout_now = True
             except Exception as e:
                 checkout_error = True
-        # if request.form.get('save_for_later') == 'save_for_later':
-        #     inventory_id = request.form['inventory_id']
+
         if  request.form['action'] == 'save':
             print("1")
             inventory_id = request.form['inventory_id']
             Cart.save_for_later(current_user.id, inventory_id)
         if  request.form['action'] == 'back':
-            #
             print(request.form['action'])
             inventory_id = request.form['inventory_id']
             Cart.add_back_to_cart(current_user.id, inventory_id)
