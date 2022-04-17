@@ -150,7 +150,7 @@ FROM Categories
     def search_prod(prod_name, sort_by, des, cat, price_l, price_h, rating_l, rating_h, avail):
         product_n = f"""'%{prod_name}%'"""
         if cat != "All":
-            cate = f"""{cat}"""
+            cate = f"""'{cat}'"""
             cate_switch = f""" """
         else:
             cate = f""" """
@@ -197,8 +197,8 @@ AND r.rating >= :rating_l
 AND r.rating <= :rating_h
 AND ac.cnt >= :avail
 {switch_des} AND LOWER(pro.description) LIKE {des_match}
-{cate_switch} AND pro.category = {cate}
-ORDER BY {product_sort}, id""",
+{cate_switch} AND pro.category = ca.id
+ORDER BY {product_sort}, pro.name""",
             price_l = price_l,
             price_h = price_h,
             rating_l = rating_l,
