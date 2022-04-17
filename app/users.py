@@ -223,6 +223,8 @@ class FilterBalForm(FlaskForm):
 def filter_balance():
     form = FilterBalForm()
     if form.validate_on_submit():
+        form.date_l.data = form.date_l.data - datetime.timedelta(days = 1)
+        form.date_h.data = form.date_h.data + datetime.timedelta(days = 1)
         if User.filter_bal(current_user.id, form.category.data,form.value_l.data, form.value_h.data,form.date_l.data,form.date_h.data):
             result = User.filter_bal(current_user.id, form.category.data, form.value_l.data, form.value_h.data,form.date_l.data,form.date_h.data)
             return render_template('search_balance_result.html', result = result)
@@ -655,3 +657,43 @@ def redirect_to():
     link = request.args.get('link', '/')
     new_link =  link
     return redirect(new_link)
+
+class SearchForm_prod(FlaskForm):
+    name = StringField('Product Name', validators=[DataRequired()])
+    sort_by = SelectField('Sort By', choices = ["price","availability"], validators = [DataRequired()])
+    des = StringField('Product Description')
+    cat = SelectField('Filter by Product Category', choices = [])
+    price_l = DecimalField('Minimum Price Lower Bound')
+    price_h = DecimalField('Minimum Price Upper Bound')
+    rating_l = DecimalField('Average Rating Lower Bound', validators = [NumberRange(min=1, max=10, message = 'Enter a number between 1 to 10')])
+    rating_h = DecimalField('Average Rating Upper Bound', validators = [NumberRange(min=1, max=10, message = 'Enter a number between 1 to 10')])
+    avail = DecimalField('Minimum Number of Product Available')
+    submit = SubmitField('Search')
+
+@bp.route('/searchProduct', methods=['GET', 'POST'])
+def searchProduct():
+    form = SearchForm_prod()
+    form.cat.choices = ["All"] + Product.get_prod_cat()
+    if form.validate_on_submit():
+        if Product.search_prod(form.name.data.lower(), form.sort_by.data, form.des.data.lower(), form.cat.data, form.price_l.data, form.price_h.data, form.rating_l.data, form.rating_h.data, form.avail.data):
+            result = Product.search_prod(form.name.data.lower(), form.sort_by.data, form.des.data.lower(), form.cat.data, form.price_l.data, form.price_h.data, form.rating_l.data, form.rating_h.data, form.avail.data)
+            return render_template('search_prod_result.html', result = result)
+        else:
+            flash("Product does not exist")
+            return render_template('search_prod.html', form = form)
+    else:
+        if not form.des.data:
+            form.des.data = "optional"
+        if not form.cat.data:
+            form.cat.data = "All"
+        if not form.price_l.data:
+            form.price_l.data = 0
+        if not form.price_h.data:
+            form.price_h.data = 9999999999999999
+        if not form.rating_l.data:
+            form.rating_l.data = 1
+        if not form.rating_h.data:
+            form.rating_h.data = 10
+        if not form.avail.data:
+            form.avail.data = 1
+        return render_template('search_prod.html', form = form)

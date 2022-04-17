@@ -6,7 +6,7 @@
 
     <h2>Cart</h2>
     {% if current_user.is_authenticated %}
-        {% if is_checked_out_just_now %}
+        {% if checkout_now %}
             <br>
             <h2>Thank you for your order, {{ current_user.firstname }}. </h2>
             <p>Your order has been placed. </p>
@@ -17,7 +17,7 @@
             <h2>Unable to check out. </h2>
             <br>
         {% endif %}
-        <h2>Your cart:</h2>
+        <h3>Your cart:</h3>
 
         {% if cart|length > 0 %}
             <table class='table table-hover table-bordered container'>
@@ -27,7 +27,8 @@
                     <th scope="col">Seller</th>
                     <th scope="col">Price</th>
                     <th scope="col">Quantity</th>
-                    <th scope="col">Actions</th>
+                    <th scope="col">Remove from cart</th>
+                    <th scope="col">More</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -50,7 +51,15 @@
                             <form action="{{ url_for('cart.cart') }}" method="post">
                                 <input type="hidden" name="action" value="remove"/>
                                 <input type="hidden" name="inventory_id" value="{{ i.inventory_id }}"/>
-                                <input type="submit" value="Remove from Cart">
+                                <input type="submit" value="Commit">
+                            </form>
+                        </td>
+                        <td>
+                            <form action="{{ url_for('cart.cart') }}" method="post">
+                                <input type="hidden" name="action" value="save"/>
+                                <input type="hidden" name="buyer_id" value="{{ i.buyer_id }}"/>
+                                <input type="hidden" name="inventory_id" value="{{ i.inventory_id }}"/>
+                                <input type="submit" value="Save for later">
                             </form>
                         </td>
                     </tr>
@@ -64,6 +73,61 @@
             </form>
         {% else %}
             <p>No item found in your cart.</p>
+        {% endif %}
+        
+        <br />
+        <h3>Your saved products:</h3>
+        {% if save|length > 0 %}
+            <table class='table table-hover table-bordered container'>
+                <thead class="thead-dark">
+                <tr>
+                    <th scope="col">Product name</th>
+                    <th scope="col">Seller</th>
+                    <th scope="col">Price</th>
+                    <th scope="col">Quantity</th>
+                    <th scope="col">Remove from saving list</th>  
+                    <!-- edit this remove? -->
+                    <th scope="col">More</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for i in save %}
+                    <tr>
+                        <th scope="row">{{ i.product_name }}</th>
+                        <td>{{ i.seller_name }}</td>
+                        <td>{{ i.product_price }}</td>
+                        <td>
+                             <form action="{{ url_for('cart.cart') }}" method="post">
+                                <input type="hidden" name="action" value="change_quantity"/>
+                                <input type="hidden" name="inventory_id" value="{{ i.inventory_id }}"/>
+                                 <label>
+                                     <input type="number" name="quantity" value="{{ i.quantity }}">
+                                 </label>
+                                 <input type="submit" value="Update">
+                            </form>
+                        </td>
+                        <td>
+                            <form action="{{ url_for('cart.cart') }}" method="post">
+                                <input type="hidden" name="action" value="remove"/>
+                                <input type="hidden" name="inventory_id" value="{{ i.inventory_id }}"/>
+                                <input type="submit" value="Commit">
+                            </form>
+                        </td>
+                        <td>
+                            <form action="{{ url_for('cart.cart') }}" method="post">
+                                <input type="hidden" name="action" value="back"/>
+                                <input type="hidden" name="buyer_id" value="{{ i.buyer_id }}"/>
+                                <input type="hidden" name="inventory_id" value="{{ i.inventory_id }}"/>
+                                <input type="submit" value="Add back to cart">
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            <h4>Total price: {{ total_save }}</h4>
+        {% else %}
+            <p>No item found in your saving list.</p>
         {% endif %}
 
     {% else %}

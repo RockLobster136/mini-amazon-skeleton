@@ -42,23 +42,36 @@ def cart():
                 Cart.change_quantity(current_user.id, request.form['inventory_id'], new_quantity)
         if request.form['action'] == 'checkout':
             try:
-                Cart.palce_order(current_user.id)
+                Cart.place_order(current_user.id)
                 checkout_now = True
             except Exception as e:
                 checkout_error = True
+
+        if  request.form['action'] == 'save':
+            print("1")
+            inventory_id = request.form['inventory_id']
+            Cart.save_for_later(current_user.id, inventory_id)
+        if  request.form['action'] == 'back':
+            print(request.form['action'])
+            inventory_id = request.form['inventory_id']
+            Cart.add_back_to_cart(current_user.id, inventory_id)
 
     this_cart = []
     if current_user.is_authenticated:
         # current login user
         this_cart = Cart.user_cart(current_user.id)
+        this_save = Cart.user_save(current_user.id)
     else:
         pass
     categories = Product.get_prod_cat()
     total_price = sum([prod.product_price * prod.quantity for prod in this_cart]) if len(this_cart) > 0 else 0
-    # render the page by adding information to the index.html file
+    total_save = sum([prod.product_price * prod.quantity for prod in this_save]) if len(this_save) > 0 else 0
+
     return render_template('cart.html',
                            cart=this_cart,
+                           save=this_save,
                            categories=categories,
                            checkout_now=checkout_now,
                            total_price=total_price,
+                           total_save=total_save,
                            checkout_error=checkout_error)

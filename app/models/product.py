@@ -146,6 +146,67 @@ FROM Categories
 ''')    
         return [row[1] for row in rows]
 
+    @staticmethod
+    def search_prod(prod_name, sort_by, des, cat, price_l, price_h, rating_l, rating_h, avail):
+        p_name = prod_name.strip(" ")
+        p_name_match = f"""'%{p_name[0]}%"""
+        if len(p_name) > 2:
+            for i in range(1,len(p_name)-1):
+                p_name_match = p_name_match + f"""%{p_name[i]}%"""
+        p_name_match = p_name_match + f"""%{p_name[len(p_name)-1]}%'"""
+        if cat != "All":
+            cate = f"""'{cat}'"""
+            cate_switch = f""" """
+        else:
+            cate = f""" """
+            cate_switch = f"""--"""
+        if sort_by == "price":
+            product_sort = f"""ac.min_price"""
+        else:
+            product_sort = f"""ac.cnt DESC"""
+        product_des = f"""'%{des}%'"""
+        if des != "optional":
+            switch_des = " "
+            des_words = des.strip(" ")
+            des_match = f"""'%{des_words[0]}%"""
+            if len(des_words) > 2:
+                for i in range(1,len(des_words)-1):
+                    des_match = des_match + f"""%{des_words[i]}%"""
+            des_match = des_match + f"""%{des_words[len(des_words) - 1]}%'"""
+        else:
+            switch_des = f"""--"""
+            des_match = f""" """
+        rows = app.db.execute(f"""
+WITH
+ratings(pid, rating) as
+(SELECT pid, round(avg(rating),2)
+FROM ProductFeedback
+GROUP BY pid),
+cat_temp(id, name) as
+(SELECT id, name
+FROM Categories
+{cate_switch} WHERE name = {cate}
+),
+avail_cnt(pid, min_price, cnt) as
+(SELECT pid, min(price),count(*)
+FROM Inventory
+GROUP BY pid)
 
-
-    
+SELECT pro.id as id, ca.name as ca_name, pro.name as name, ac.min_price as price, ac.cnt as avail, r.rating as rating, pro.description as des, pro.image as img
+FROM Products pro JOIN avail_cnt ac ON pro.id = ac.pid JOIN ratings r ON r.pid = pro.id JOIN cat_temp ca ON ca.id = pro.category
+WHERE
+LOWER(pro.name) LIKE {p_name_match}
+AND ac.min_price >= :price_l
+AND ac.min_price <= :price_h
+AND r.rating >= :rating_l
+AND r.rating <= :rating_h
+AND ac.cnt >= :avail
+{switch_des} AND LOWER(pro.description) LIKE {des_match}
+{cate_switch} AND pro.category = ca.id
+ORDER BY {product_sort}, pro.name""",
+            price_l = price_l,
+            price_h = price_h,
+            rating_l = rating_l,
+            rating_h = rating_h,
+            avail = avail)
+        return rows
