@@ -343,18 +343,41 @@ def view_seller(uid = None):
         #feedback = User.get_seller_feedback(uid)
         seller_feedbacks = SellerFeedback.get_all_feedbacks_ofseller(uid)
         rating_summary = SellerFeedback.summary_rating(uid)
-        return render_template("view_seller.html", seller_info = seller_info, feedback = feedback, seller_feedbacks = seller_feedbacks, rating_summary = rating_summary)
+        return render_template("view_seller.html", seller_info = seller_info, feedback = feedback, seller_feedbacks = seller_feedbacks, rating_summary = rating_summary, sid = uid)
     return None
 
 
 
+
+class ProdForm(FlaskForm):
+    prodName = StringField('Product Name',validators=[DataRequired()])
+    prodCat = SelectField('Product Category',choices=[])
+    description = StringField(' Description',validators=[DataRequired()])
+    image = StringField('Image',validators=[DataRequired()])
+    Price = DecimalField('Price', 
+            validators=[DataRequired(), NumberRange(min=0, message='Can not enter negative number')])
+    Quantity = IntegerField('Quantity', 
+                validators=[DataRequired(),NumberRange(min=0, message='Can not enter negative number')])
+    submit = SubmitField('Commit')
+
+@bp.route('/addproduct', methods=['GET','POST'])
+def addprod():
+    if current_user.is_authenticated and current_user.isSeller:
+        form = InventoryForm()
+        if form.validate_on_submit:
+            form.prodCat.choices = Product.get_prod_cat()
+            sellerId = current_user.id
+            if form.prodName.data:
+                if form.Quantity.data and form.Price.data:
+                    if Product.add_prod(form.prodName.data,form.prodCat.data,form.Quantity.data,form.Price.data):
+                            flash("Successfully created new Inventory")
+                            return render_template('addinventory.html',form = form)
 
 @bp.route('/history/addinventory', methods=['GET','POST'])
 def addinventory():
     if current_user.is_authenticated and current_user.isSeller:
         form = InventoryForm()
         if form.validate_on_submit:
-            
             form.prodCat.choices = Product.get_prod_cat()
             if Product.get_by_category(form.prodCat.data):
                 form.prodName.choices = [product for product in Product.get_by_category(form.prodCat.data)]
@@ -384,6 +407,8 @@ def update_inventory(iid = None):
                     flash("Successfully update this Inventory")
                     return render_template("update.html",form = form)
     return render_template("update.html",form = form)
+
+
 
 
 @bp.route('/info/orders', methods=['GET','POST'])
@@ -448,6 +473,8 @@ def view_order(oid = None):
                     reviewed.append(False)
         return render_template("view.html", order_detail = order_detail, seller_info = seller_info, purchased = purchased, reviewed = reviewed, feedbacks = feedbacks)
     return render_template("view.html", order_detail = None, seller_info = None)
+
+
 
 
 class SearchForm_order(FlaskForm):
@@ -540,18 +567,18 @@ class FeedbackForm(FlaskForm):
     upvote = SelectField('Upvote', choices = ['Not Helpful', 'Helpful', 'Very Helpful'])
 
 @bp.route('/feedback', methods=['GET','POST'])
-def feedback():
+def feedback(channel = None):
     # retrive buyer's feedbacks
     if current_user.is_authenticated:
         product_feedbacks = ProductFeedback.get_all_feedbacks(current_user.id)
         seller_feedbacks = SellerFeedback.get_all_feedbacks(current_user.id)
-        return render_template('feedback.html', product_feedbacks = product_feedbacks, seller_feedbacks = seller_feedbacks)
+        return render_template('feedback.html', product_feedbacks = product_feedbacks, seller_feedbacks = seller_feedbacks, channel = channel)
     else:
         return render_template('feedback.html', product_feedbacks = None, seller_feedbacks = None)
 
 
-@bp.route('/feedback/add_feedback/<isseller>', methods=['GET','POST'])
-def add_feedback(isseller =None, pid = None, sid = None):
+@bp.route('/feedback/add_feedback/<isseller>-<channel>', methods=['GET','POST'])
+def add_feedback(isseller =None, pid = None, sid = None, channel = None):
     if current_user.is_authenticated:
         choose = False
         form = FeedbackForm()
@@ -559,12 +586,12 @@ def add_feedback(isseller =None, pid = None, sid = None):
             sids = SellerFeedback.non_reviewed_sellers(current_user.id)
             choices = [User.get_user_name(sid)[0] for sid in sids]
             form.sellerName.choices = choices
-            print(choices)
             if form.rating.data:
                 sid = sids[choices==form.sellerName.data]
                 if SellerFeedback.add_feedback(current_user.id, sid, form.rating.data, form.review.data):
                     flash("Succesfully added review!")
-                    return render_template('add_feedback.html', form=form,isseller = isseller)
+                    return render_template('add_feedback.html', form=form,isseller = isseller, channel = channel, sid=sid)
+            return render_template('add_feedback.html', form=form,isseller = isseller, channel = channel, sid=sid)
         else: # review product
             choices = ProductFeedback.non_reviewed_products(current_user.id)
             form.prodName.choices = choices
@@ -574,14 +601,14 @@ def add_feedback(isseller =None, pid = None, sid = None):
                     choose = True
                 if ProductFeedback.add_feedback(current_user.id, pid, form.rating.data, form.review.data):
                     flash("Succesfully added review!")
-        return render_template('add_feedback.html', form=form,isseller = isseller, choose = choose)
+        return render_template('add_feedback.html', form=form,isseller = isseller, choose = choose, channel = channel,sid=sid)
     else:
         return render_template('add_feedback.html', form=None,isseller = None)
 
         
 
-@bp.route('/feedback/edit_feedback/<feedback_id>-<isseller>', methods=['GET','POST'])
-def edit_feedback(feedback_id = None, isseller = None, pid = None, sid = None):
+@bp.route('/feedback/edit_feedback/<feedback_id>-<isseller>-<channel>', methods=['GET','POST'])
+def edit_feedback(feedback_id = None, isseller = None, pid = None, sid = None, channel = None):
     if feedback_id:
         form = FeedbackForm()
         choose = False
@@ -594,7 +621,7 @@ def edit_feedback(feedback_id = None, isseller = None, pid = None, sid = None):
                         flash("Successfully deleted review")
                     else:
                         flash("Successfully edited review")
-                    return render_template('edit_feedback.html', form = form, choose = choose)
+                    return render_template('edit_feedback.html', form = form, choose = choose, channel = channel)
             else:
                 if sid:
                     choose = True
@@ -603,7 +630,7 @@ def edit_feedback(feedback_id = None, isseller = None, pid = None, sid = None):
                         flash("Successfully deleted review")
                     else:
                         flash("Successfully edited review")
-                    return render_template('edit_feedback.html', form = form, choose = choose)
+                    return render_template('edit_feedback.html', form = form, choose = choose, channel = channel)
         return render_template('edit_feedback.html', form = form)
 
 @bp.route('/feedback/upvote_feedback/<feedback_id>-<isseller>', methods=['GET','POST'])
@@ -636,6 +663,7 @@ def view_prod(pid =None):
     review_status = "cannot review"
     inventory = Inventory.get_sellers_for_product(int(pid))
     if pid:
+        print(pid)
         prod_info = Product.get(pid)
         product_feedbacks = ProductFeedback.get_all_feedbacks_ofproduct(pid)
         if current_user.is_authenticated:
@@ -643,7 +671,7 @@ def view_prod(pid =None):
                 feedback_id = ProductFeedback.find_product_feedbackid(current_user.id, pid)
                 if feedback_id: # reviewed
                     review_status = "can update"
-                    return render_template("view_prod.html",prod_info = prod_info,pid = pid, feedback_id = feedback_id, review_status = review_status, product_feedbacks = product_feedbacks ) # pass in fid
+                    return render_template("view_prod.html",prod_info = prod_info,pid = pid, feedback_id = feedback_id, review_status = review_status, inventory = inventory, product_feedbacks = product_feedbacks ) # pass in fid
                 else: # not reviewed
                     review_status = "can review"
             else: # not purchased

@@ -29,11 +29,11 @@
      {% if purchased[i] %}
      {% if reviewed[i] %}
     <a class="btn btn-secondary" 
-      href="{{ url_for('users.edit_feedback',sid =53456353453, feedback_id = feedbacks[i], isseller = 'Yes') }}" 
+      href="{{ url_for('users.edit_feedback',sid = order_detail[i].sid, feedback_id = feedbacks[i], isseller = 'Yes', channel = 'order_detail', oid = order_detail[i].order_id) }}" 
       role="button">Update feedback</a>
      {% else %}
      <a class="btn btn-secondary" 
-      href="{{ url_for('users.add_feedback', isseller = 'Yes') }}" 
+      href="{{ url_for('users.add_feedback', isseller = 'Yes', channel = 'order_detail', oid = order_detail[i].order_id, sid = order_detail[i].sid) }}" 
       role="button">Add feedback </a>
      {% endif %}
      {% else %}
