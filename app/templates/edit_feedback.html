@@ -10,7 +10,7 @@
     {{ form.rating.label }}<br/>
     {{ form.rating(size=1) }}<br/>
     {{ form.review.label }}<br/>
-    {{ form.review(size=1) }}<br/>
+    {{ form.review(size=64) }}<br/>
     {{ form.delete.label }}<br/>
     {{ form.delete(size=1) }}<br/>
   </p>
@@ -27,10 +27,14 @@
   </p>
   <p>{{ form.submit() }}</p>
 </form>
-{% if choose %}
-<a class="btn btn-secondary" href="{{ url_for('users.feedback') }}" role="button">return to feedback</a>
-{% else %}
-<a class="btn btn-secondary" href="{{ url_for('index.index') }}" role="button">return to home</a>
+{% if channel == "product_page" %}
+<a class="btn btn-secondary" href="{{ url_for('index.index') }}" role="button">return</a>
+{% elif channel == "feedback" %}
+<a class="btn btn-secondary" href="{{ url_for('users.feedback') }}" role="button">return</a>
+{% elif channel == "order_detail" %}
+<a class="btn btn-secondary" href="{{ url_for('users.history') }}" role="button">return</a>
+{% elif channel == "seller_page" %}
+<a class="btn btn-secondary" href="{{ url_for('index.index') }}" role="button">return</a>
 {% endif %}
 
 {% endblock %}

@@ -11,6 +11,7 @@
       <th scope="col">Product Name</th>
       <th scope="col">Category</th>
       <th scope="col">Seller</th>
+      <th scope="col">Review Seller</th>
       <th scope="col">Price</th>
       <th scope="col">Quantity</th>
       <th scope="col">Total Price</th>
@@ -20,15 +21,34 @@
     </tr>
   </thead>
   <tbody>
-    <th scope="row">{{order_detail[0].prodname}}</th>
-    <td>{{order_detail[0].podcat}}</td>
+    {% for i in range(order_detail|length) %}
+    <th scope="row">{{order_detail[i].prodname}}</th>
+    <td>{{order_detail[i].podcat}}</td>
     <td>{{seller_info}}</td>
-    <td>{{order_detail[0].price}}</td>
-    <td>{{order_detail[0].quantity}}</td>
-    <td>{{order_detail[0].total}}</td>
-    <td>{{order_detail[0].address}}</td>
-    <td>{{order_detail[0].order_status}}</td>
-    <td>{{order_detail[0].fulfill_date}}</td>
+    <td>{% if not current_user.isSeller %}
+     {% if purchased[i] %}
+     {% if reviewed[i] %}
+    <a class="btn btn-secondary" 
+      href="{{ url_for('users.edit_feedback',sid = order_detail[i].sid, feedback_id = feedbacks[i], isseller = 'Yes', channel = 'order_detail', oid = order_detail[i].order_id) }}" 
+      role="button">Update feedback</a>
+     {% else %}
+     <a class="btn btn-secondary" 
+      href="{{ url_for('users.add_feedback', isseller = 'Yes', channel = 'order_detail', oid = order_detail[i].order_id, sid = order_detail[i].sid) }}" 
+      role="button">Add feedback </a>
+     {% endif %}
+     {% else %}
+     You cannot review this seller for now. Feedbacks can be leaved after purchasing.
+     {% endif %}
+    {% else %}
+    Only buyers can leave reviews here.
+    {% endif %}</td>
+    <td>{{order_detail[i].price}}</td>
+    <td>{{order_detail[i].quantity}}</td>
+    <td>{{order_detail[i].total}}</td>
+    <td>{{order_detail[i].address}}</td>
+    <td>{{order_detail[i].order_status}}</td>
+    <td>{{order_detail[i].fulfill_date}}</td>
+    {% endfor %}
   </tbody>
 </table>
 

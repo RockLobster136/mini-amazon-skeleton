@@ -9,7 +9,7 @@
 {% elif current_user.is_authenticated %}
 <h6>Your Feedbacks:</h6>
 
-<a class="btn btn-secondary" href="{{ url_for('users.add_feedback', isseller='Yes',pid = None) }}" role="button">Add Your Seller Feedback</a>
+<a class="btn btn-secondary" href="{{ url_for('users.add_feedback', isseller='Yes',pid = None, channel = 'feedback') }}" role="button">Add Your Seller Feedback</a>
 <table class='table table-hover table-bordered container'>
     <thead class="thead-dark">
       <tr>
@@ -19,7 +19,6 @@
         <th scope="col">Upvote</th>
         <th scope="col">Date</th>
         <th scope="col">Action</th>
-        <th scope="col">Upvote</th>
       </tr>
     </thead>
     <tbody>
@@ -32,7 +31,7 @@
           <td>{{feedback.upvotes}}</td>
           <td>{{feedback.time_feedback}}</td>
           <td> <a class="btn btn-secondary" 
-            href="{{ url_for('users.edit_feedback',feedback_id = feedback.id, isseller = 'Yes') }}" 
+            href="{{ url_for('users.edit_feedback',feedback_id = feedback.id, isseller = 'Yes', channel = 'feedback') }}" 
             role="button">Update feedback</a>
           </td>
         </tr>
@@ -44,7 +43,7 @@
     </tbody>
 </table>
 
-<a class="btn btn-secondary" href="{{ url_for('users.add_feedback', isseller='No',pid = None) }}" role="button">Add Your Product Feedback</a>
+<a class="btn btn-secondary" href="{{ url_for('users.add_feedback', isseller='No',pid = None, channel = 'feedback') }}" role="button">Add Your Product Feedback</a>
 <table class='table table-hover table-bordered container'>
     <thead class="thead-dark">
       <tr>
@@ -54,7 +53,6 @@
         <th scope="col">Upvote</th>
         <th scope="col">Date</th>
         <th scope="col">Action</th>
-        <th scope="col">Upvote</th>
       </tr>
     </thead>
     <tbody>
@@ -67,12 +65,10 @@
           <td>{{feedback.upvotes}}</td>
           <td>{{feedback.time_feedback}}</td>
           <td> <a class="btn btn-secondary" 
-            href="{{ url_for('users.edit_feedback',feedback_id = feedback.id, isseller = 'No') }}" 
+            href="{{ url_for('users.edit_feedback',feedback_id = feedback.id, isseller = 'No', channel = 'feedback') }}" 
             role="button">Update feedback</a>
           </td>
-          <td> <a class="btn btn-secondary" 
-            href="{{ url_for('users.upvote_feedback',feedback_id = feedback.id, isseller = 'No') }}" 
-            role="button">Upvote</a>
+
         </tr>
       {% endfor %}
       {% endif %}

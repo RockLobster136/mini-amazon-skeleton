@@ -253,6 +253,16 @@ ORDER BY time_purchased DESC ,order_id
                               sid=sid
                               )
         return rows
+    def buyer_analytics(sid):
+        rows = app.db.execute(
+        '''
+        SELECT COUNT(DISTINCT uid) AS buyer_cnt,SUM(quantity),COUNT(DISTINCT order_id),ROUND(AVG(price),2)
+        FROM Purchases
+        WHERE sid = :sid
+        ''',
+        sid = sid
+        )
+        return rows
     
 
 
