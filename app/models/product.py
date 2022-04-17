@@ -148,7 +148,12 @@ FROM Categories
 
     @staticmethod
     def search_prod(prod_name, sort_by, des, cat, price_l, price_h, rating_l, rating_h, avail):
-        product_n = f"""'%{prod_name}%'"""
+        p_name = prod_name.strip(" ")
+        p_name_match = f"""'%{p_name[0]}%"""
+        if len(p_name) > 2:
+            for i in range(1,len(p_name)-1):
+                p_name_match = p_name_match + f"""%{p_name[i]}%"""
+        p_name_match = p_name_match + f"""%{p_name[len(p_name)-1]}%'"""
         if cat != "All":
             cate = f"""'{cat}'"""
             cate_switch = f""" """
@@ -190,7 +195,7 @@ GROUP BY pid)
 SELECT pro.id as id, ca.name as ca_name, pro.name as name, ac.min_price as price, ac.cnt as avail, r.rating as rating, pro.description as des, pro.image as img
 FROM Products pro JOIN avail_cnt ac ON pro.id = ac.pid JOIN ratings r ON r.pid = pro.id JOIN cat_temp ca ON ca.id = pro.category
 WHERE
-pro.name LIKE {product_n}
+LOWER(pro.name) LIKE {p_name_match}
 AND ac.min_price >= :price_l
 AND ac.min_price <= :price_h
 AND r.rating >= :rating_l
