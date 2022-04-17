@@ -223,6 +223,8 @@ class FilterBalForm(FlaskForm):
 def filter_balance():
     form = FilterBalForm()
     if form.validate_on_submit():
+        form.date_l.data = form.date_l.data - datetime.timedelta(days = 1)
+        form.date_h.data = form.date_h.data + datetime.timedelta(days = 1)
         if User.filter_bal(current_user.id, form.category.data,form.value_l.data, form.value_h.data,form.date_l.data,form.date_h.data):
             result = User.filter_bal(current_user.id, form.category.data, form.value_l.data, form.value_h.data,form.date_l.data,form.date_h.data)
             return render_template('search_balance_result.html', result = result)
