@@ -270,8 +270,8 @@ SELECT id, category, start, amount, start+amount as end, time_changed
 FROM BalanceHistory
 WHERE uid = :uid
 AND category = {cat}
-AND amount >= :val_l
-AND amount <= :val_h
+AND ABS(amount) >= :val_l
+AND ABS(amount) <= :val_h
 AND time_changed >= :d_l
 AND time_changed <= :d_h
 ORDER BY time_changed DESC """
