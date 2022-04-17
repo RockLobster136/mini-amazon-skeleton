@@ -501,10 +501,11 @@ def seller_insight():
     num_seller = User.get_num_sellers()
     rank_per = round(rating_summary[2]/num_seller[0][0],4)*100
     top_prods = Purchase.top_prod(current_user.id)
+    buyer_analytics = Purchase.buyer_analytics(current_user.id)
     if form.validate_on_submit():
         name = form.prdoname.data.replace(" ", "-")
-        return render_template('insights.html',form = form,name = name,rating_summary = rating_summary,rank = rank_per,top_prods = top_prods)
-    return render_template('insights.html',form = form,rating_summary=rating_summary,rank = rank_per,top_prods = top_prods)
+        return render_template('insights.html',form = form,name = name,rating_summary = rating_summary,rank = rank_per,top_prods = top_prods,buyer_analytics = buyer_analytics)
+    return render_template('insights.html',form = form,rating_summary=rating_summary,rank = rank_per,top_prods = top_prods,buyer_analytics = buyer_analytics)
 
 @bp.route("/insights/<prodname>", methods=['GET','POST'])
 def prod_viz(prodname = None):

@@ -47,6 +47,9 @@
     <a class="btn btn-secondary" href="{{ url_for('users.prod_viz',prodname = name) }}" role="button">Go</a>
   </form>
   <h3> Your Ratings </h3> <br>
+  Your have served {{buyer_analytics[0][0]}} users, with {{buyer_analytics[0][1]}} products sold from {{buyer_analytics[2]}} orders. The average price of products sold is 
+  {{buyer_analytics[0][3]}}<br>
+  Your 
   Your are reviewed by {{rating_summary[1]}} users 
   <br>Your average rating is {{rating_summary[0]}}
   <br> In terms of average rating, You ranked {{rating_summary[2]}} among all the sellers(top {{ rank}}%)
