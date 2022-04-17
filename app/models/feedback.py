@@ -133,7 +133,6 @@ class ProductFeedback:
         else:
             return None
 
-# new
     @staticmethod
     def check_purchase_product(uid, pid):
         rows = app.db.execute('''
@@ -159,6 +158,31 @@ class ProductFeedback:
         pid = pid)
         if len(rows)>0:
             return rows[0][0]
+        else:
+            return None
+    
+    @staticmethod
+    def get_all_feedbacks_ofproduct(pid):
+        # get all feed backs of a product
+        rows = app.db.execute('''
+        WITH t1 AS (
+        SELECT id, uid, pid, rating, review, upvotes, time_feedback
+        FROM ProductFeedback
+        WHERE pid = :pid
+        ORDER BY upvotes DESC
+        LIMIT 3)
+        (SELECT *
+        FROM t1)
+        UNION ALL
+        (SELECT id, uid, pid, rating, review, upvotes, time_feedback
+        FROM ProductFeedback
+        WHERE pid = :pid AND id NOT IN (SELECT id FROM t1)
+        ORDER BY time_feedback DESC) 
+        ''',
+        pid = pid
+        )
+        if len(rows)>0:
+            return rows
         else:
             return None
 
@@ -208,7 +232,6 @@ class SellerFeedback:
         review = review
         )
         id = rows[0][0]
-        print(id)
         return id
     
     @staticmethod
@@ -288,7 +311,6 @@ class SellerFeedback:
         else:
             return [-1,-1] # return -1 when no feedback
 
-# new
     @staticmethod
     def check_purchase_seller(uid, sid):
         rows = app.db.execute('''
@@ -315,5 +337,55 @@ class SellerFeedback:
         sid = sid)
         if len(rows)>0:
             return rows[0][0]
+        else:
+            return None
+
+    @staticmethod
+    def find_sid_from_oid(order_id):
+        rows = app.db.execute('''
+        SELECT sid
+        FROM Purchases
+        WHERE order_id = :order_id
+        ''', 
+        order_id = order_id)
+        if len(rows)>0:
+            return rows[0][0]
+        else:
+            return None
+
+    @staticmethod
+    def get_all_feedbacks_ofseller(sid):
+        # get all feed backs of a seller
+        rows = app.db.execute('''
+        WITH t1 AS (
+        SELECT id, uid, sid, rating, review, upvotes, time_feedback
+        FROM SellerFeedback
+        WHERE sid = :sid
+        ORDER BY upvotes DESC
+        LIMIT 3)
+        (SELECT *
+        FROM t1)
+        UNION ALL
+        (SELECT id, uid, sid, rating, review, upvotes, time_feedback
+        FROM SellerFeedback
+        WHERE sid = :sid AND id NOT IN (SELECT id FROM t1)
+        ORDER BY time_feedback DESC) 
+        ''',
+        sid = sid
+        )
+        if len(rows)>0:
+            return rows
+        else:
+            return None
+
+    @staticmethod
+    def summary_rating(sid):
+        rows = app.db.execute('''
+        SELECT ROUND(AVG(rating),2) AS avg_rating, COUNT(rating) AS cnt_rating
+        FROM SellerFeedback
+        WHERE sid = :sid
+        ''', sid = sid)
+        if len(rows)>0:
+            return rows
         else:
             return None

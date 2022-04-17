@@ -106,8 +106,8 @@ RETURNING id
     @staticmethod
     def get_sellers_for_product(pid):
         rows = app.db.execute(f'''
-           SELECT Inventory.id, Inventory.pid AS pid, Products.name AS name, category, Inventory.price, quantity, 
-                 Inventory.sid, Users.firstname AS seller_firstname, Users.lastname AS seller_lastname
+           SELECT Inventory.id, Inventory.sid, Inventory.pid AS pid, category, Products.name AS name, quantity, Inventory.price,
+                  Inventory.release_date,  Users.firstname AS seller_firstname, Users.lastname AS seller_lastname
            FROM Inventory, Products, Users
            WHERE Inventory.pid = Products.id AND Users.id = Inventory.sid AND Inventory.pid={pid}
            ORDER BY price ASC

@@ -28,6 +28,7 @@
   <a class="btn btn-secondary" href="{{ url_for('users.orders') }}" role="button">View My Orders</a>
   {%else %}
   <p> This is your Buyer's account <p>
+  <a href="{{ url_for('users.feedback') }}" type="button" class="btn btn-secondary">My Feedback</a>
     {% endif %}
   <p>
   <a class="btn btn-secondary" href="{{ url_for('users.edit_info') }}" role="button">Edit Profile</a>

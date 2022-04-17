@@ -19,7 +19,6 @@
         <th scope="col">Upvote</th>
         <th scope="col">Date</th>
         <th scope="col">Action</th>
-        <th scope="col">Upvote</th>
       </tr>
     </thead>
     <tbody>
@@ -54,7 +53,6 @@
         <th scope="col">Upvote</th>
         <th scope="col">Date</th>
         <th scope="col">Action</th>
-        <th scope="col">Upvote</th>
       </tr>
     </thead>
     <tbody>
@@ -70,9 +68,7 @@
             href="{{ url_for('users.edit_feedback',feedback_id = feedback.id, isseller = 'No') }}" 
             role="button">Update feedback</a>
           </td>
-          <td> <a class="btn btn-secondary" 
-            href="{{ url_for('users.upvote_feedback',feedback_id = feedback.id, isseller = 'No') }}" 
-            role="button">Upvote</a>
+
         </tr>
       {% endfor %}
       {% endif %}

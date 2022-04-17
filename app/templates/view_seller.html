@@ -3,6 +3,7 @@
 {% block content %}
 
 <h3>Seller Details:</h3>
+<table class='table table-hover table-bordered container'>
 <a class="btn btn-secondary" href="{{ url_for('index.index') }}" role="button">Home</a>
 <a class="btn btn-secondary" href="{{ url_for('users.search_user') }}" role="button">Return to Search</a>
 <br><br>
@@ -31,21 +32,47 @@
 
 <br><br>
 <h3>Seller Feedback:</h3>
-<br><br>
+<a class="btn btn-secondary" href="{{ url_for('users.add_feedback', isseller='Yes',pid = None) }}" role="button">Add Your Seller Feedback</a>
+<br> <br>
+Feedback Summary:
+<table class='table table-hover table-bordered container'>
+  <thead class="thead-dark">
+    <tr>
+      <th scope="col">Average Rating</th>
+      <th scope="col">Rating Count</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for fb in rating_summary%}
+    <tr>
+    <th scope="row">{{fb[0]}}</th>
+    <td>{{fb[1]}}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+View All Feedbacks:
 <table class='table table-hover table-bordered container'>
   <thead class="thead-dark">
     <tr>
       <th scope="col">Rating</th>
       <th scope="col">Review</th>
+      <th scope="col">Upvotes</th>
+      <th scope="col">Add Upvotes</th>
       <th scope="col">Time Submitted</th>
     </tr>
   </thead>
   <tbody>
-    {% for fb in feedback%}
+    {% for fb in seller_feedbacks%}
       <tr>
-        <th scope="row">{{fb.rating}}</th>
-        <td>{{fb.review}}</td>
-        <td>{{fb.time_feedback}}</td>
+        <th scope="row">{{fb[3]}}</th>
+        <td>{{fb[4]}}</td>
+        <td>{{fb[5]}} </td>
+        <td><a class="btn btn-secondary" 
+          href="{{ url_for('users.upvote_feedback',feedback_id = fb[0], isseller = 'Yes') }}" 
+          role="button">Upvote</a> </td>
+        <td>{{fb[6]}}</td>
       </tr>
     {% endfor %}
   </tbody>

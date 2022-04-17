@@ -68,7 +68,39 @@ This is the product page for  {{pid}}
         </tbody>
     </table>
 </div>
+
+<h2>Product Feedbacks:</h2>
+<table class='table table-hover table-bordered container'>
+    <thead class="thead-dark">
+      <tr>
+        <th scope="col">Rating</th>
+        <th scope="col">Review</th>
+        <th scope="col">Upvote</th>
+        <th scope="col">Date</th>
+        <th scope="col">Upvote</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% if product_feedbacks %}
+      {% for feedback in product_feedbacks %}
+        <tr>
+          <th scope="row">{{feedback[3]}}</th>
+          <td>{{feedback[4]}}</td>
+          <td>{{feedback[5]}}</td>
+          <td>{{feedback[6]}}</td>
+          <td> <a class="btn btn-secondary" 
+            href="{{ url_for('users.upvote_feedback',feedback_id = feedback.id, pid = prod_info.id, isseller = 'No') }}" 
+            role="button">Upvote</a>
+        </tr>
+      {% endfor %}
+      {% endif %}
+    </tbody>
+</table>
+
+
 <br>
+{% if not current_user.isSeller %}
+<h4>Manage Your Product Feedback here:</h4>
 {% if review_status == "can review" %}
 <a class="btn btn-secondary" 
     href="{{ url_for('users.add_feedback', isseller='No', pid = pid, sid=None) }}" 
@@ -80,7 +112,8 @@ This is the product page for  {{pid}}
 {% else %}
     You cannot review this product for now. Feedbacks can be leaved after purchasing
 {% endif %}
-
+{% endif %}
+<br>
 <br>
 <td> <a class="btn btn-secondary" 
     href="{{ url_for('index.index') }}" 
