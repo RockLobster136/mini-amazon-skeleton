@@ -19,7 +19,7 @@ CREATE TABLE Users (
     firstname VARCHAR(255) NOT NULL,
     lastname VARCHAR(255) NOT NULL,
     isseller BOOLEAN NOT NULL,
-    balance DECIMAL(12,2) NOT NULL,
+    balance DECIMAL(12,2) NOT NULL DEFAULT 0.00 check ( balance >= 0.00 ),
     address VARCHAR(255)
 );
 CREATE TABLE Categories (
