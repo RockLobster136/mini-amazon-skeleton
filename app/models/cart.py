@@ -16,17 +16,6 @@ class Cart:
     
     # get cart info for this user
     @staticmethod
-    # def user_cart(buyer_id):
-    #     rows = app.db.execute(
-    #         '''
-    #         SELECT P.id AS product_id, P.name AS product_name,C.uid AS buyer_id, C.iid AS inventory_id,  U.firstname AS seller_firstname,
-    #             U.lastname AS seller_lastname, C.quantity, C.save_for_later, I.price AS product_price
-    #         FROM Carts AS C, Products as P, Inventory as I, Users as U
-    #         WHERE C.iid = I.id AND I.pid = P.id AND I.sid = U.id AND C.uid = :uid
-    #         ''',
-    #         uid = buyer_id
-    #     )
-    #     return [Cart(*row) for row in rows]
     def user_cart(buyer_id):
         rows = app.db.execute(
             '''
@@ -113,24 +102,26 @@ class Cart:
         queries = [f'''UPDATE Inventory SET quantity = quantity - {row[3]} WHERE id = {row[-2]};''' for row in rows]
         app.db.execute(' '.join(queries))
 
-        # update balance
-        # update buyer
-        ## update BalanceHistory
+        ## update balance
+        # update user's BalanceHistory
         Cart.update_balance(current_user.balance, -amount, purchase_id, buyer_id,1)
-        ## update user balance？？
+        # update user balance
         User.mgmt_fund(buyer_id,current_user.balance - amount) 
 
         # update seller
         for row in rows:
             seller_id = row[5]
             current_seller = User.get(seller_id)
+            # update sellers' BalanceHistory
             Cart.update_balance(current_seller.balance, amount, purchase_id, seller_id,2)
+            # update seller balance
             User.mgmt_fund(seller_id,current_seller.balance + amount)
 
         # delete cart record
         rows = app.db.execute(f'''DELETE FROM Carts WHERE uid={buyer_id} AND save_for_later = FALSE;''')
         return rows
     
+    # add product to save for later
     @staticmethod
     def save_for_later(buyer_id, inventory_id):
         rows = app.db.execute('''UPDATE Carts 
@@ -139,6 +130,7 @@ class Cart:
                               buyer_id=buyer_id, inventory_id=inventory_id)
         return rows
     
+    # add product back to cart
     @staticmethod
     def add_back_to_cart(buyer_id, inventory_id):
         rows = app.db.execute('''UPDATE Carts 
