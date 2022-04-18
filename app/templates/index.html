@@ -4,10 +4,11 @@
 
 <br><br>
 
-<h2>Products for sale:<br><a class="btn btn-secondary" href="{{ url_for('users.searchProduct') }}" role="button">Search Product</a></h2>
+<h2>Products for sale:<br><a class="btn btn-secondary" href="{{ url_for('users.searchProduct') }}" role="button">Search Product</a>
 {% if current_user.isSeller %}
-:<a class="btn btn-secondary" href="{{ url_for('users.addprod') }}" role="button">Add Product</a></h2>
-:<a class="btn btn-secondary" href="{{ url_for('users.view_my_prod') }}" role="button">View Products Created</a></h2>
+<a class="btn btn-secondary" href="{{ url_for('users.addprod') }}" role="button">Add Product</a>
+  <a class="btn btn-secondary" href="{{ url_for('users.view_my_prod') }}" role="button">View Products Created</a></h2>
+
 {% endif  %}
 
 <table class='table table-hover table-bordered container'>

@@ -140,27 +140,6 @@ ORDER BY time_purchased DESC ,order_id
                               oid=oid)
 
         return [Purchase(*row) for row in rows]
-    @staticmethod
-    def filter_by_conditions(sid,oid,year,status = True):
-        rows = app.db.execute('''
-SELECT Pur.id, Pur.uid, Pur.pid, Pur.sid, Pur.time_purchased, Pur.quantity,
-Pur.price,order_id,order_status,fulfill_date,Pro.name,Categories.name,Pro.description,
-Pro.image,U.address
-FROM Purchases Pur
-INNER JOIN Products Pro
-ON Pur.pid = Pro.id
-INNER JOIN Users U
-ON Pur.uid = U.id
-INNER JOIN Categories
-ON Categories.id = Pro.category
-WHERE sid = :sid
-AND Pur.id = :oid and order_status = :status AND time_purchased > year
-ORDER BY time_purchased DESC ,order_id
-''',
-                              sid=sid,
-                              oid=oid,
-                              status = status,
-                              year = year)
 
 
 
