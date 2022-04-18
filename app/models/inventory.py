@@ -83,7 +83,6 @@ WHERE id = :id
 RETURNING id
 """,
                               id = id)
-        print(rows[0][0])
         if len(rows) != 0:
             return rows[0][0]
         else:
