@@ -48,7 +48,12 @@
   </form>
   <h3> Your Ratings </h3> <br>
   Your have served {{buyer_analytics[0][0]}} users, with {{buyer_analytics[0][1]}} products sold from {{buyer_analytics[2]}} orders. The average price of products sold is 
-  {{buyer_analytics[0][3]}}<br>
+  {% if buyer_analytics[0][3] %}
+  {{buyer_analytics[0][3]}}
+  {% else %}
+  N/A 
+  {% endif %}
+  <br>
   Your 
   Your are reviewed by {{rating_summary[1]}} users 
   <br>Your average rating is {{rating_summary[0]}}

@@ -569,9 +569,13 @@ def seller_insight():
     form.prdoname.choices = prodnames
     rating_summary = SellerFeedback.seller_feedback_summary(current_user.id)
     num_seller = User.get_num_sellers()
-    rank_per = round(rating_summary[2]/num_seller[0][0],4)*100
     top_prods = Purchase.top_prod(current_user.id)
     buyer_analytics = Purchase.buyer_analytics(current_user.id)
+    if rating_summary[0] > 0:
+        rank_per = round(rating_summary[2]/num_seller[0][0],4)*100
+    else:
+        rating_summary = [0,0]
+        rank_per = 100
     if form.validate_on_submit():
         name = form.prdoname.data.replace(" ", "-")
         return render_template('insights.html',form = form,name = name,rating_summary = rating_summary,rank = rank_per,top_prods = top_prods,buyer_analytics = buyer_analytics)
