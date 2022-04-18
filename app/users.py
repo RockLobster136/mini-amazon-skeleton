@@ -377,7 +377,6 @@ def addprod():
             if form.prodName.data and form.prodCat.data:
                 if Product.prod_find(form.prodName.data):
                     flash("Product Exists")
-                    print(1)
                     return render_template('addprod.html',form = form)
                 if form.Quantity.data and form.Price.data:
                     category_id = form.prodCat.choices.index(form.prodCat.data)
