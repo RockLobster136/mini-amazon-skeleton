@@ -80,6 +80,7 @@ View All Feedbacks:
     </tr>
   </thead>
   <tbody>
+  {% if seller_feedbacks %}
     {% for fb in seller_feedbacks%}
       <tr>
         <th scope="row">{{fb[3]}}</th>
@@ -91,6 +92,7 @@ View All Feedbacks:
         <td>{{fb[6]}}</td>
       </tr>
     {% endfor %}
+  {% endif %}
   </tbody>
 </table>
 
