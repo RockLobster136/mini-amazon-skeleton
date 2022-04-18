@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1>{{ page_title }}</h1>
+
+<form action="{{ url_for('edit_product.edit_product') }}" enctype="multipart/form-data" method="post">
+    <label for="pname">Product name:</label><br>
+    <input type="text" id="pname" name="pname" value="{{ dummy_product.name }}"><br><br>
+
+    <label for="category">Choose a category:</label>
+    <select id="category" name="category">
+        {% for i in categories %}
+            <option value="{{ i.cid }}" {{ 'selected' if dummy_product.cid == i.cid }}>{{ i.name }}</option>
+        {% endfor %}
+    </select><br><br>
+
+    <label for="description">Product description:</label><br>
+    <input type="text" id="description" name="description" value="{{ dummy_product.description }}"><br><br>
+
+    <input type="hidden" id="pid" name="pid" value="{{ dummy_product.id }}">
+    <input type="hidden" id="action" name="action" value="{{ action }}">
+
+    <label for="image">Product image:</label><br>
+    <input type="file" name="image">
+    <p>The image will stay unchanged or be the default one if you don't upload anything.</p>
+    <br><br>
+
+    <input type="submit" value="Done">
+  </form> 
+
+{% endblock %}
