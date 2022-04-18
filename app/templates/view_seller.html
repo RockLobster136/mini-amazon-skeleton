@@ -32,8 +32,24 @@
 
 <br><br>
 <h3>Seller Feedback:</h3>
-<a class="btn btn-secondary" href="{{ url_for('users.add_feedback', isseller='Yes',pid = None, channel = 'seller_page', sid=sid) }}" role="button">Add Your Seller Feedback</a>
-<br> <br>
+
+<br>
+{% if not current_user.isSeller %}
+<h4>Manage Your Seller Feedback here:</h4>
+{% if review_status == "can review" %}
+<a class="btn btn-secondary" 
+    href="{{ url_for('users.add_feedback', isseller='Yes', sid=sid, channel = 'seller_page') }}" 
+    role="button">Add Your Feedback of this Product Here</a>
+{%elif review_status == "can update" %}
+<td> <a class="btn btn-secondary" 
+    href="{{ url_for('users.edit_feedback',feedback_id = feedback_id, isseller = 'Yes', channel = 'seller_page') }}" 
+    role="button">Update feedback</a>
+{% else %}
+    You cannot review this seller for now. Feedbacks can be leaved after purchasing
+{% endif %}
+{% endif %}
+<br>
+<br>
 Feedback Summary:
 <table class='table table-hover table-bordered container'>
   <thead class="thead-dark">

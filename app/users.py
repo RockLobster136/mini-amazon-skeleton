@@ -343,7 +343,13 @@ def view_seller(uid = None):
         #feedback = User.get_seller_feedback(uid)
         seller_feedbacks = SellerFeedback.get_all_feedbacks_ofseller(uid)
         rating_summary = SellerFeedback.summary_rating(uid)
-        return render_template("view_seller.html", seller_info = seller_info, feedback = feedback, seller_feedbacks = seller_feedbacks, rating_summary = rating_summary, sid = uid)
+        if SellerFeedback.check_purchase_seller(current_user.id, uid):
+            review_status = 'can review'
+            if SellerFeedback.find_seller_feedbackid(current_user.id, uid):
+                review_status = 'can update'
+        else:
+            review_status = 'cannot review'
+        return render_template("view_seller.html", seller_info = seller_info, feedback = feedback, seller_feedbacks = seller_feedbacks, rating_summary = rating_summary, sid = uid, review_status = review_status)
     return None
 
 
@@ -663,7 +669,6 @@ def view_prod(pid =None):
     review_status = "cannot review"
     inventory = Inventory.get_sellers_for_product(int(pid))
     if pid:
-        print(pid)
         prod_info = Product.get(pid)
         product_feedbacks = ProductFeedback.get_all_feedbacks_ofproduct(pid)
         if current_user.is_authenticated:
