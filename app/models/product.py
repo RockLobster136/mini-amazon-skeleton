@@ -71,11 +71,12 @@ ORDER BY P.name
         return [Product(*row) for row in rows]
 
     # add new product
+    @staticmethod
     def add_prod(name,category,description = None, price = None, image = None, available = True, creator_id = None):
         try:
             rows = app.db.execute("""
-INSERT INTO Products(name, category, description, price, image, available)
-VALUES(:name, :category, :description, :price, :image, :available)
+INSERT INTO Products(name, category, description, price, image, available, creator_id)
+VALUES(:name, :category, :description, :price, :image, :available,:creator_id)
 RETURNING id
 """,
                                   name=name,
@@ -92,25 +93,38 @@ RETURNING id
         except Exception as e:
             print(str(e))
             return None
-
+    @staticmethod
+    def delete_prod(pid):
+        rows = app.db.execute("""
+DELETE FROM Inventory
+WHERE pid = :pid
+RETURNING id
+""",
+                              pid = pid)
+        rows = app.db.execute("""
+DELETE FROM Products
+WHERE id = :pid
+RETURNING id
+""",
+                              pid = pid)
+        if len(rows) != 0:
+            return rows[0][0]
+        else:
+            return None
     # update product
     @staticmethod
-    def update_prod(name, category, description =None, image = None, available = True, creator_id = None):
+    def update_prod(pid,name, description =None, image = None):
         try:
             rows = app.db.execute("""
     UPDATE Products
-    SET name = :name, description = :description, image = :image, price = :price, category = :category
-    WHERE creator_id = :creator_id
-    """,
+    SET name = :name, description = :description, image = :image
+    WHERE id = :pid
+    """,                            pid = pid,
                                     name=name,
-                                    category=category,
                                     description=description,
                                     image=image,
-                                    available=available,
-                                    creator_id=creator_id)
-            id = rows[0][0]
-            print("Product Updated:", id, name, category, description, image, available, creator_id)
-            return
+                                    )
+            return rows
         except Exception as e:
             print(e)
             return None
@@ -210,3 +224,14 @@ ORDER BY {product_sort}, pro.name""",
             rating_h = rating_h,
             avail = avail)
         return rows
+
+    @staticmethod
+    def get_own_prod(sid):
+        rows = app.db.execute('''
+SELECT *
+FROM Products
+WHERE creator_id = :sid
+''',
+                              sid=sid)
+
+        return [Product(*row) for row in rows]

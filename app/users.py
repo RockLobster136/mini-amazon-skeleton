@@ -356,28 +356,65 @@ def view_seller(uid = None):
 
 
 class ProdForm(FlaskForm):
-    prodName = StringField('Product Name',validators=[DataRequired()])
+    prodName = StringField('Product Name')
     prodCat = SelectField('Product Category',choices=[])
-    description = StringField(' Description',validators=[DataRequired()])
-    image = StringField('Image',validators=[DataRequired()])
+    description = StringField(' Description')
+    image = StringField('Image')
     Price = DecimalField('Price', 
             validators=[DataRequired(), NumberRange(min=0, message='Can not enter negative number')])
     Quantity = IntegerField('Quantity', 
                 validators=[DataRequired(),NumberRange(min=0, message='Can not enter negative number')])
+    delete =SelectField('Delete this Inventory', choices = ["No","Yes"], validators = [DataRequired()])
     submit = SubmitField('Commit')
 
 @bp.route('/addproduct', methods=['GET','POST'])
 def addprod():
     if current_user.is_authenticated and current_user.isSeller:
-        form = InventoryForm()
+        form = ProdForm()
         if form.validate_on_submit:
             form.prodCat.choices = Product.get_prod_cat()
             sellerId = current_user.id
-            if form.prodName.data:
+            if form.prodName.data and form.prodCat.data:
+                if Product.prod_find(form.prodName.data):
+                    flash("Product Exists")
+                    print(1)
+                    return render_template('addprod.html',form = form)
                 if form.Quantity.data and form.Price.data:
-                    if Product.add_prod(form.prodName.data,form.prodCat.data,form.Quantity.data,form.Price.data):
+                    category_id = form.prodCat.choices.index(form.prodCat.data)
+                    new_pid = Product.add_prod(form.prodName.data,category_id,form.description.data,form.Price.data,form.image.data,True,sellerId)
+                    if new_pid:
+                        flash("Successfully created new Product")
+                        if Inventory.add_inventory(sellerId,new_pid,form.Quantity.data,form.Price.data):
                             flash("Successfully created new Inventory")
-                            return render_template('addinventory.html',form = form)
+                        return render_template('addprod.html',form = form)
+        return render_template('addprod.html',form = form)
+
+@bp.route('/viewmyproduct', methods=['GET','POST'])
+def view_my_prod():
+    if current_user.is_authenticated:
+        if current_user.isSeller:
+            record = Product.get_own_prod(current_user.id)
+            return render_template('view_own_prod.html',record = record)
+    return render_template('view_own_prod.html',record = None)
+
+@bp.route('/editprod/<pid>', methods=['GET','POST'])
+def edit_prod(pid = None):
+    if current_user.is_authenticated and current_user.isSeller:
+        form = ProdForm()
+        if form.validate_on_submit:
+            if pid:
+                if form.delete.data == "Yes":
+                    print(pid)
+                    if Product.delete_prod(pid):
+                        flash("Product Deleted")
+                    return render_template("update_prod.html",form = form,pid = current_user.id)
+                else:
+                    if Product.update_prod(pid,form.prodName.data, form.description.data,form.image.data):
+                        flash("Successfully update this Product")
+                        return render_template("update_prod.html",form = form,pid = current_user.id)
+    return render_template("update_prod.html",form = form,pid = current_user.id)
+
+
 
 @bp.route('/history/addinventory', methods=['GET','POST'])
 def addinventory():
@@ -594,6 +631,9 @@ def add_feedback(isseller =None, pid = None, sid = None, channel = None):
             form.sellerName.choices = choices
             if form.rating.data:
                 sid = sids[choices==form.sellerName.data]
+                for i in range(len(choices)):
+                    if choices[i] == form.sellerName.data:
+                        sid = sids[i]
                 if SellerFeedback.add_feedback(current_user.id, sid, form.rating.data, form.review.data):
                     flash("Succesfully added review!")
                     return render_template('add_feedback.html', form=form,isseller = isseller, channel = channel, sid=sid)

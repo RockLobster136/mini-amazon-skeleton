@@ -12,4 +12,4 @@ class Category:
                 FROM Categories
                 WHERE id = {cid}
             ''')
-        return Categories(*(rows[0])) if rows is not None else None
+        return Category(*(rows[0])) if rows is not None else None

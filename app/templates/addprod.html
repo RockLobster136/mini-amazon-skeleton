@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h5>Manage Inventory</h5>
+
+<form action="" method="post" novalidate>
+  {{ form.hidden_tag() }}
+  <p>
+    {{ form.prodName.label }}<br/>
+    {{ form.prodName(size=10) }}<br/>
+    {{ form.prodCat.label }}<br/>
+    {{ form.prodCat(size=1) }}<br/>
+    {{ form.description.label }}<br/>
+    {{ form.description(size=1) }}<br/>
+    {{ form.image.label }}<br/>
+    {{ form.image(size=1) }}<br/>
+    {{ form.Price.label }}<br/>
+    {{ form.Price(size=32) }}<br/>
+    {{ form.Quantity.label }}<br/>
+    {{ form.Quantity(size=32) }}<br/>  
+  
+    {% for error in form.Price.errors %}
+    <span style="color: red;">[{{ error }}]</span>
+    {% endfor %}
+    {% for error in form.Quantity.errors %}
+    <span style="color: red;">[{{ error }}]</span>
+    {% endfor %}
+  </p>
+  <p>
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <ul>
+      {% for message in messages %}
+      <li>{{ message }}</li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+    {% endwith %}
+  </p>
+  <p>{{ form.submit() }}</p>
+</form>
+<a class="btn btn-secondary" href="{{ url_for('index.index') }}" role="button">return</a>
+{% endblock %}

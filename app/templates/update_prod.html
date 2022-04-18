@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h5>Manage Your Product</h5>
+
+<form action="" method="post" novalidate>
+  {{ form.hidden_tag() }}
+  <p>
+    {{ form.prodName.label }}<br/>
+    {{ form.prodName(size=10) }}<br/>
+    {{ form.description.label }}<br/>
+    {{ form.description(size=32) }}<br/>
+    {{ form.image.label }}<br/>
+    {{ form.image(size=10) }}<br/>
+    {{ form.delete.label }}<br/>
+    {{ form.delete(size=1) }}<br/>  
+    {% for error in form.Price.errors %}
+    <span style="color: red;">[{{ error }}]</span>
+    {% endfor %}
+    {% for error in form.Quantity.errors %}
+    <span style="color: red;">[{{ error }}]</span>
+    {% endfor %}
+  </p>
+  <p>
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <ul>
+      {% for message in messages %}
+      <li>{{ message }}</li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+    {% endwith %}
+  </p>
+  <p>{{ form.submit() }}</p>
+</form>
+<a class="btn btn-secondary" href="{{ url_for('users.view_my_prod', pid = pid) }}" role="button">return</a>
+{% endblock %}

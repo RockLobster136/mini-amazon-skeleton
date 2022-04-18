@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% if current_user.is_authenticated and current_user.isSeller %}
+<h3>Your Products:</h3>
+
+<br>
+<table class='table table-hover table-bordered container'>
+  <thead class="thead-dark">
+    <tr>
+      <th scope="col">Product Category</th>
+      <th scope="col">Product Name</th>
+      <th scope="col">Product Description</th>
+      <th scope="col">Product Image</th>
+      <th scope="col">Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for r in record%}
+      <tr>
+        <th scope="row">{{r.category}}</th>
+        <td>{{r.name}}</td>
+        <td>{{r.description}}</td>
+        <td>{{r.image}}</td>
+        <td> 
+            <a class="btn btn-secondary" href="{{ url_for('users.edit_prod',pid = r.id) }}" role="button">EDIT</a>
+        </td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% endif %}
+
+{% endblock %}
+
+
+
